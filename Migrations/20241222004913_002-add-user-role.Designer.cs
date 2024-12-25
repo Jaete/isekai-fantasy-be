@@ -60,18 +60,15 @@ namespace IsekaiFantasyBE.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Bio")
-                        .IsRequired()
                         .HasColumnType("Text");
 
                     b.Property<DateTime>("LastActivity")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Photo")
-                        .IsRequired()
                         .HasColumnType("VARCHAR(255)");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("VARCHAR(32)");
 
                     b.Property<Guid>("UserId")
