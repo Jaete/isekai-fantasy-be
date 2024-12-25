@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using IsekaiFantasyBE.Database;
@@ -18,13 +19,13 @@ public class User
     
     public byte[] Password { get; set; }
     
-    [JsonIgnore]
+    [JsonIgnore][Column(TypeName = DbProperties.Datetime)][DefaultValue(DbProperties.CurrentTimestamp)]
     public DateTime? CreatedAt { get; set; }
     
-    [JsonIgnore]
+    [JsonIgnore][Column(TypeName = DbProperties.Datetime)][DefaultValue(DbProperties.CurrentTimestamp)] 
     public DateTime? UpdatedAt { get; set; }
     
-    [JsonIgnore]
+    [JsonIgnore][Column(TypeName = DbProperties.Datetime)][DefaultValue(DbProperties.CurrentTimestamp)] 
     public DateTime? LastLogin { get; set; }
     
     [JsonIgnore]
