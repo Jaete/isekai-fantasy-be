@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IsekaiFantasyBE.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20241222004043_001-create-user")]
-    partial class _001createuser
+    [Migration("20241225030540_003-dates-self-create")]
+    partial class _003datesselfcreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -27,22 +27,22 @@ namespace IsekaiFantasyBE.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime");
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime>("LastLogin")
-                        .HasColumnType("datetime");
+                    b.Property<DateTime?>("LastLogin")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<byte[]>("Password")
                         .IsRequired()
                         .HasColumnType("longblob");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -60,22 +60,22 @@ namespace IsekaiFantasyBE.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Bio")
-                        .IsRequired()
                         .HasColumnType("Text");
 
-                    b.Property<DateTime>("LastActivity")
-                        .HasColumnType("datetime");
+                    b.Property<DateTime?>("LastActivity")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Photo")
-                        .IsRequired()
                         .HasColumnType("VARCHAR(255)");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("VARCHAR(32)");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("char(36)");
+
+                    b.Property<int?>("UserRole")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

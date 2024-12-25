@@ -21,9 +21,9 @@ namespace IsekaiFantasyBE.Migrations
                     Username = table.Column<string>(type: "VARCHAR(32)", nullable: false),
                     Email = table.Column<string>(type: "longtext", nullable: false),
                     Password = table.Column<byte[]>(type: "longblob", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    LastLogin = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    LastLogin = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
                 {
@@ -38,10 +38,10 @@ namespace IsekaiFantasyBE.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     UserId = table.Column<Guid>(type: "char(36)", nullable: false),
-                    Photo = table.Column<string>(type: "VARCHAR(255)", nullable: false),
-                    Bio = table.Column<string>(type: "Text", nullable: false),
+                    Photo = table.Column<string>(type: "VARCHAR(255)", nullable: true),
+                    Bio = table.Column<string>(type: "Text", nullable: true),
                     Status = table.Column<string>(type: "VARCHAR(32)", nullable: false),
-                    LastActivity = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                    LastActivity = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
                 {

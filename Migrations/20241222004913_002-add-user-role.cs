@@ -13,7 +13,7 @@ namespace IsekaiFantasyBE.Migrations
                 name: "UserRole",
                 table: "UsersProperties",
                 type: "int",
-                nullable: false,
+                nullable: true,
                 defaultValue: UserProperties.Role.Member);
         }
 

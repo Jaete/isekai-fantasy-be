@@ -25,21 +25,21 @@ namespace IsekaiFantasyBE.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime>("LastLogin")
+                    b.Property<DateTime?>("LastLogin")
                         .HasColumnType("datetime(6)");
 
                     b.Property<byte[]>("Password")
                         .IsRequired()
                         .HasColumnType("longblob");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Username")
@@ -58,24 +58,21 @@ namespace IsekaiFantasyBE.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Bio")
-                        .IsRequired()
                         .HasColumnType("Text");
 
-                    b.Property<DateTime>("LastActivity")
+                    b.Property<DateTime?>("LastActivity")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Photo")
-                        .IsRequired()
                         .HasColumnType("VARCHAR(255)");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("VARCHAR(32)");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("char(36)");
 
-                    b.Property<int>("UserRole")
+                    b.Property<int?>("UserRole")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
