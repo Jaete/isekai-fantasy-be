@@ -3,6 +3,7 @@ using System;
 using IsekaiFantasyBE.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IsekaiFantasyBE.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    partial class UserDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241225132405_003-dates-default-value")]
+    partial class _003datesdefaultvalue
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -27,8 +29,8 @@ namespace IsekaiFantasyBE.Migrations
 
                     b.Property<DateTime?>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasDefaultValue()
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -36,17 +38,17 @@ namespace IsekaiFantasyBE.Migrations
 
                     b.Property<DateTime?>("LastLogin")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasDefaultValue()
+                        .HasColumnType("datetime");
 
                     b.Property<byte[]>("Password")
                         .IsRequired()
                         .HasColumnType("longblob");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValue()
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -68,8 +70,8 @@ namespace IsekaiFantasyBE.Migrations
 
                     b.Property<DateTime?>("LastActivity")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasDefaultValue()
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Photo")
                         .HasColumnType("VARCHAR(255)");
@@ -85,8 +87,7 @@ namespace IsekaiFantasyBE.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("UsersProperties");
                 });
@@ -94,8 +95,8 @@ namespace IsekaiFantasyBE.Migrations
             modelBuilder.Entity("IsekaiFantasyBE.Models.Users.UserProperties", b =>
                 {
                     b.HasOne("IsekaiFantasyBE.Models.Users.User", "User")
-                        .WithOne("Properties")
-                        .HasForeignKey("IsekaiFantasyBE.Models.Users.UserProperties", "UserId")
+                        .WithMany("Properties")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
