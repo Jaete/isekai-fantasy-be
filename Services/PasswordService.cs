@@ -6,8 +6,13 @@ namespace IsekaiFantasyBE.Services;
 
 public static class PasswordService
 {
-    public static void Validate(string password)
+    public static void Validate(string? password)
     {
+        if (password is null)
+        {
+            throw new ArgumentException(ApiMessages.PasswordInvalidLength);
+        }
+        
         if (password.Length < 8)
         {
             throw new ArgumentException(ApiMessages.PasswordInvalidLength);
@@ -36,6 +41,11 @@ public static class PasswordService
 
     public static byte[] Encrypt(string password)
     {
+        if (password == null)
+        {
+            throw new ArgumentNullException(nameof(password), "Password cannot be null.");
+        }
+        
         using var sha256Hash = SHA256.Create();
 
         var bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
@@ -44,9 +54,7 @@ public static class PasswordService
     
     public static bool Verify(string password, byte[] hash)
     {
-        using var sha256Hash = SHA256.Create();
-
-        var bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
+        var bytes = Encrypt(password);
         return bytes.SequenceEqual(hash);
     }
 }
