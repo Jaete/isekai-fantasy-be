@@ -14,4 +14,7 @@ public class ApiMessages
     public const string PasswordInvalidLower = "Password must have at least one lower case letter.";
     public const string PasswordInvalidDigit = "Password must have at least one digit.";
     public const string PasswordInvalidSpecial = "Password must have at least one special character.";
+    public const string EmptyCredentials = "Username and password must not be empty.";
+    public const string WrongPassword = "Password is incorrect.";
+    public const string LoginSuccess = "Login successful.";
 }

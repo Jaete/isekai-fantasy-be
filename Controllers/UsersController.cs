@@ -3,6 +3,7 @@ using IsekaiFantasyBE.Models.Users;
 using IsekaiFantasyBE.Models.Response;
 using IsekaiFantasyBE.Services;
 using Microsoft.AspNetCore.Mvc;
+using OneOf;
 
 namespace IsekaiFantasyBE.Controllers;
 
@@ -86,7 +87,33 @@ public class UsersController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
 
-        var user = response.Data as User;
-        return Ok(Response<Guid>.Success(user!.Id, ApiMessages.UserCreated, StatusCodes.Status201Created));
+        var user = response.Data.Value.Match(
+            user => user,
+            error => throw new ArgumentException(error)
+        );
+        return Ok(Response<Guid>.Success(user.Id, ApiMessages.UserCreated, StatusCodes.Status201Created));
+    }
+    
+    [HttpPost]
+    [Route("login")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<Response<string>>> Login([FromBody] UserDTO userDto)
+    {
+        var response = await _userService.LoginUser(userDto);
+        
+        if (response.StatusCode == StatusCodes.Status400BadRequest)
+        {
+            return BadRequest(response);
+        }
+
+        if (response.StatusCode == StatusCodes.Status401Unauthorized)
+        {
+            return Unauthorized(response);
+        }
+
+        return Ok(response);
     }
 }

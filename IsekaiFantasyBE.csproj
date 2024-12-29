@@ -99,11 +99,13 @@
 
     <ItemGroup>
       <PackageReference Include="chocolatey" Version="2.4.1" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.33" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.0">
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
       <PackageReference Include="MySql.EntityFrameworkCore" Version="8.0.8" />
+      <PackageReference Include="OneOf" Version="3.0.271" />
       <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
     </ItemGroup>
 
