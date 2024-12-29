@@ -22,17 +22,17 @@ public class Response<T>
         StatusCode = statusCode;
     }
     
-    public static Response<Guid> Success(Guid value, string message, int statusCode) => new(value, message, statusCode);
-
-    public static Response<OneOf<User, string>?> Success(OneOf<User, string> value, string message, int statusCode) => new(value, message, statusCode);
+    public static Response<Guid> SuccessGuid(Guid value, string message, int statusCode) => new(value, message, statusCode);
     
-    public static Response<OneOf<User, string>?> Fail(OneOf<User, string> value, string message, int statusCode) => new(value, message, statusCode);
+    public static Response<User?> SuccessUser(User value, string message, int statusCode) => new(value, message, statusCode);
     
-    public static  Response<OneOf<User, string>?> FailWithException(OneOf<User, string> value, string message, int statusCode, string stack) => new(value, message, statusCode, stack);
+    public static Response<User?> FailUser(User value, string message, int statusCode) => new(value, message, statusCode);
     
-    public static Response<string> Success(string value, string message, int statusCode) => new(value, message, statusCode);
+    public static Response<string?> SuccessString(string value, string message, int statusCode) => new(value, message, statusCode);
     
-    public static Response<string> FailString(string value, string message, int statusCode) => new(value, message, statusCode);
+    public static Response<string?> FailString(string value, string message, int statusCode) => new(value, message, statusCode);
     
-    public static  Response<string> FailStringWithException(string value, string message, int statusCode, string stack) => new(value, message, statusCode, stack);
+    public static  Response<User?> FailWithException(User value, string message, int statusCode, string stack) => new(value, message, statusCode, stack);
+    
+    public static  Response<string?> FailStringWithException(string value, string message, int statusCode, string stack) => new(value, message, statusCode, stack);
 }

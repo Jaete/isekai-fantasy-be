@@ -51,4 +51,20 @@ public class UserRepository : IUserRepository
             throw new Exception(e.Message);
         }
     }
+
+    public async Task UpdateUserProperties(UserProperties newUserProperties)
+    {
+        var properties = await _dbContext.UsersProperties.FirstOrDefaultAsync(up => up.User.Id == newUserProperties.User.Id);
+        if (properties == null)
+        {
+            throw new Exception("User properties not found");
+        }
+        
+        properties.Bio = newUserProperties.Bio;
+        properties.Photo = newUserProperties.Photo;
+        properties.LastActivity = DateTime.Now;
+
+        _dbContext.UsersProperties.Update(properties);
+        await _dbContext.SaveChangesAsync();
+    }
 }

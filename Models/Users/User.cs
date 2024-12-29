@@ -29,5 +29,5 @@ public class User
     public DateTime? LastLogin { get; set; }
     
     [JsonIgnore]
-    public ICollection<UserProperties>? Properties { get; set; }
+    public UserProperties? Properties { get; set; }
 }

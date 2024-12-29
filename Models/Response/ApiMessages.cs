@@ -17,4 +17,7 @@ public class ApiMessages
     public const string EmptyCredentials = "Username and password must not be empty.";
     public const string WrongPassword = "Password is incorrect.";
     public const string LoginSuccess = "Login successful.";
+    public const string NotAuthenticated = "Unauthorized. You must be logged in.";
+    public const string InsufficientPermissions = "Unauthorized. Insufficient permissions.";
+    public const string UserUpdated = "User updated successfully.";
 }

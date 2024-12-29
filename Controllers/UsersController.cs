@@ -2,6 +2,7 @@
 using IsekaiFantasyBE.Models.Users;
 using IsekaiFantasyBE.Models.Response;
 using IsekaiFantasyBE.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OneOf;
 
@@ -17,20 +18,26 @@ public class UsersController : ControllerBase
     {
         _userService = userService;    
     }
-    
+
     [HttpGet]
     [Route("id/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<Response<User>>> GetById(Guid id)
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<Response<User?>>> GetById(string id)
     {
-        var users = await _userService.GetUserById(id);
+        JwtService.RequireAuthentication(HttpContext);
+        var guid = Guid.Parse(id);
+        var users = await _userService.GetUserById(guid, HttpContext);
 
         return users.StatusCode switch
         {
             StatusCodes.Status400BadRequest => BadRequest(users),
             StatusCodes.Status404NotFound => NotFound(users),
+            StatusCodes.Status401Unauthorized => Unauthorized(users),
+            StatusCodes.Status500InternalServerError => StatusCode(StatusCodes.Status500InternalServerError, users),
             _ => Ok(users)
         };
     }
@@ -40,33 +47,41 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<Response<User>>> GetByEmail(string email)
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<Response<User?>>> GetByEmail(string email)
     {
-        var user = await _userService.GetUserByEmail(email);
+        JwtService.RequireAuthentication(HttpContext);
+        var user = await _userService.GetUserByEmail(email, HttpContext);
 
         return user.StatusCode switch
         {
             StatusCodes.Status400BadRequest => BadRequest(user),
             StatusCodes.Status404NotFound => NotFound(user),
+            StatusCodes.Status401Unauthorized => Unauthorized(user),
+            StatusCodes.Status500InternalServerError => StatusCode(StatusCodes.Status500InternalServerError, user),
             _ => Ok(user)
         };
     }
-    
+
     [HttpGet]
     [Route("username/{username}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<Response<User>>> GetByUsername(string username)
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<Response<User?>>> GetByUsername(string username)
     {
-        var user = await _userService.GetUserByUsername(username);
-
-        return user.StatusCode switch
-        {
-            StatusCodes.Status400BadRequest => BadRequest(user),
-            StatusCodes.Status404NotFound => NotFound(user),
-            _ => Ok(user)
-        };
+        
+            var user = await _userService.GetUserByUsername(username, HttpContext);
+            return user.StatusCode switch
+            {
+                StatusCodes.Status400BadRequest => BadRequest(user),
+                StatusCodes.Status404NotFound => NotFound(user),
+                StatusCodes.Status401Unauthorized => Unauthorized(user),
+                StatusCodes.Status500InternalServerError => StatusCode(StatusCodes.Status500InternalServerError, user),
+                _ => Ok(user)
+            };
     }
     
     [HttpPost]
@@ -77,21 +92,15 @@ public class UsersController : ControllerBase
     public async Task<ActionResult<Response<Guid>>> Register([FromBody] UserDTO userDto)
     {
         var response = await _userService.RegisterNewUser(userDto);
-        if (response.StatusCode == StatusCodes.Status400BadRequest)
+        var user = response.Data;
+        return response.StatusCode switch
         {
-            return BadRequest(response);
-        }
-
-        if (response.StatusCode == StatusCodes.Status500InternalServerError)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError, response);
-        }
-
-        var user = response.Data.Value.Match(
-            user => user,
-            error => throw new ArgumentException(error)
-        );
-        return Ok(Response<Guid>.Success(user.Id, ApiMessages.UserCreated, StatusCodes.Status201Created));
+            StatusCodes.Status400BadRequest => BadRequest(response),
+            StatusCodes.Status404NotFound => NotFound(response),
+            StatusCodes.Status500InternalServerError => StatusCode(StatusCodes.Status500InternalServerError, response),
+            _ => Ok(Response<Guid>.SuccessGuid(user!.Id, ApiMessages.UserCreated, StatusCodes.Status201Created)),
+        };
+        
     }
     
     [HttpPost]
@@ -99,21 +108,37 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<Response<string>>> Login([FromBody] UserDTO userDto)
     {
         var response = await _userService.LoginUser(userDto);
-        
-        if (response.StatusCode == StatusCodes.Status400BadRequest)
-        {
-            return BadRequest(response);
-        }
 
-        if (response.StatusCode == StatusCodes.Status401Unauthorized)
+        return response.StatusCode switch
         {
-            return Unauthorized(response);
-        }
+            StatusCodes.Status400BadRequest => BadRequest(response),
+            StatusCodes.Status404NotFound => NotFound(response),
+            StatusCodes.Status500InternalServerError => StatusCode(StatusCodes.Status500InternalServerError, response),
+            _ => Ok(response),
+        };
+    }
 
-        return Ok(response);
+    [HttpPut]
+    [Route("update/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<Response<User?>>> UpdateProperties(string id, [FromBody] UserPropertiesDTO userProperties)
+    {
+        var response = await _userService.UpdateProperties(userProperties, HttpContext);
+        return response.StatusCode switch
+        {
+            StatusCodes.Status401Unauthorized => Unauthorized(response),
+            StatusCodes.Status400BadRequest => BadRequest(response),
+            StatusCodes.Status404NotFound => NotFound(response),
+            StatusCodes.Status500InternalServerError => StatusCode(StatusCodes.Status500InternalServerError, response),
+            _ => Ok(response),
+        };
     }
 }

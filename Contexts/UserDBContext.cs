@@ -32,5 +32,10 @@ public class UserDbContext : DbContext
             .Property(up => up.LastActivity)
             .HasDefaultValueSql(DbProperties.CurrentTimestamp)
             .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<UserProperties>()
+            .Property(up => up.UserRole)
+            .HasDefaultValue(UserProperties.Role.Member)
+            .ValueGeneratedOnAdd();
     }
 }
