@@ -1,10 +1,12 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Authentication;
 using System.Security.Claims;
 using System.Text;
 using IsekaiFantasyBE.Models.Response;
 using IsekaiFantasyBE.Models.Users;
 using Microsoft.IdentityModel.Tokens;
 using OneOf;
+using Exception = System.Exception;
 
 namespace IsekaiFantasyBE.Services;
 
@@ -42,14 +44,12 @@ public class JwtService
 
         return new JwtSecurityTokenHandler().WriteToken(jwtToken);
     }
-    public static Response<User?> RequireAuthentication(HttpContext context)
+    public static void RequireAuthentication(HttpContext context)
     {
         if (context.Request.Headers.Authorization.IsNullOrEmpty())
         {
-            return Response<User?>.FailUser(null!, ApiMessages.NotAuthenticated, StatusCodes.Status401Unauthorized);
+            throw new AuthenticationException(ApiMessages.NotAuthenticated);
         }
-
-        return new Response<User?>();
     }
     
     public static Guid GetAuthenticatedUserId(HttpContext context)

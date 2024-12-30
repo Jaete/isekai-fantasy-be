@@ -19,19 +19,19 @@ public class UserService
         _userRepo = userRepo;
     }
     
-    private static Response<User?> CreateSingleUserResponse(User? user)
+    private static ResponseModel CreateSingleUserResponse(User? user)
     {
         if (user is null)
         {
-            return Response<User?>.FailUser(null!, ApiMessages.UserNotFound, StatusCodes.Status404NotFound);
+            return ResponseModel.Write(null!, ApiMessages.UserNotFound, StatusCodes.Status404NotFound);
         }
 
-        return Response<User?>.SuccessUser(user, ApiMessages.UserRetrieved, StatusCodes.Status200OK);
+        return ResponseModel.Write(user, ApiMessages.UserRetrieved, StatusCodes.Status200OK);
     }
     
-    private static Response<User?> CreateEmailInvalidResponse(string email)
+    private static ResponseModel CreateEmailInvalidResponse(string email)
     {
-        return Response<User>.FailUser(null!, ApiMessages.EmailInvalid, StatusCodes.Status400BadRequest)!;
+        return ResponseModel.Write(null!, ApiMessages.EmailInvalid, StatusCodes.Status400BadRequest)!;
     }
 
     private static bool ValidateEmptyCredentials(UserDTO user)
@@ -59,23 +59,14 @@ public class UserService
         PasswordService.Validate(userDto.Password);
     }
 
-    public async Task<Response<User?>> GetUserById(Guid id, HttpContext context)
+    public async Task<ResponseModel> GetUserById(Guid id)
     {
-        var response = JwtService.RequireAuthentication(context);
-        if(response.StatusCode == StatusCodes.Status401Unauthorized){
-            return response;
-        }
         var user = await _userRepo.GetUserById(id);
         return CreateSingleUserResponse(user);
     }
 
-    public async Task<Response<User?>> GetUserByEmail(string email, HttpContext context)
+    public async Task<ResponseModel> GetUserByEmail(string email)
     {
-        var response = JwtService.RequireAuthentication(context);
-        if(response.StatusCode == StatusCodes.Status401Unauthorized){
-            return response;
-        }
-        
         if (!EmailValidationService.IsValidEmail(email))
         {
             return CreateEmailInvalidResponse(email);
@@ -85,19 +76,13 @@ public class UserService
         return CreateSingleUserResponse(user);
     }
 
-    public async Task<Response<User?>> GetUserByUsername(string username, HttpContext context)
+    public async Task<ResponseModel> GetUserByUsername(string username, HttpContext context)
     {
-        var response = JwtService.RequireAuthentication(context);
-        if(response.StatusCode == StatusCodes.Status401Unauthorized){
-            return response;
-        }
-        
         var user = await _userRepo.GetUserByUsername(username);
-        response = CreateSingleUserResponse(user);
-        return response;
+        return CreateSingleUserResponse(user);
     }
 
-    public async Task<Response<User?>> RegisterNewUser(UserDTO userDto)
+    public async Task<ResponseModel> RegisterNewUser(UserDTO userDto)
     {
         try
         {
@@ -110,15 +95,15 @@ public class UserService
                 Password = PasswordService.Encrypt(userDto.Password!),
             };
             await _userRepo.RegisterNewUser(user);
-            return Response<User?>.SuccessUser(user, ApiMessages.UserCreated, StatusCodes.Status201Created);
+            return ResponseModel.Write(user, ApiMessages.UserCreated, StatusCodes.Status201Created);
         }
         catch (Exception ex)
         {
-            return Response<User?>.FailWithException(null!, ex.Message, ExceptionService.GetStatusCode(ex), ex.StackTrace!);
+            throw new Exception(ex.Message);
         }
     }
     
-    public async Task<Response<string?>> LoginUser(UserDTO userDto)
+    public async Task<ResponseModel> LoginUser(UserDTO userDto)
     {
         try
         {
@@ -126,30 +111,25 @@ public class UserService
             var user = await _userRepo.GetUserByUsername(userDto.Username!);
             if (user is null)
             {
-                return Response<string?>.FailString(null!, ApiMessages.UserNotFound, StatusCodes.Status404NotFound);
+                return ResponseModel.Write(null!, ApiMessages.UserNotFound, StatusCodes.Status404NotFound);
             }
             
             if(!PasswordService.Verify(userDto.Password!, user.Password))
             {
-                return Response<string?>.FailString(null!, ApiMessages.WrongPassword, StatusCodes.Status400BadRequest);
+                return ResponseModel.Write(null!, ApiMessages.WrongPassword, StatusCodes.Status400BadRequest);
             }
 
             var token = JwtService.GenerateJwtToken(user);
-            return Response<string>.SuccessString(token, ApiMessages.LoginSuccess, StatusCodes.Status200OK);
+            return ResponseModel.Write(token, ApiMessages.LoginSuccess, StatusCodes.Status200OK);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            return Response<string?>.FailStringWithException("", e.Message, ExceptionService.GetStatusCode(e), e.StackTrace!);
+            throw new Exception(ex.Message);
         }
     }
 
-    public async Task<Response<User?>> UpdateProperties(UserPropertiesDTO properties, HttpContext context)
+    public async Task<ResponseModel> UpdateProperties(UserPropertiesDTO properties, HttpContext context)
     {
-        var response = JwtService.RequireAuthentication(context);
-        if(response.StatusCode == StatusCodes.Status401Unauthorized){
-            return response;
-        }
-
         try
         {
             var userId = JwtService.GetAuthenticatedUserId(context);
@@ -157,23 +137,24 @@ public class UserService
             
             if (user is null)
             {
-                return Response<User?>.FailUser(null!, ApiMessages.UserNotFound, StatusCodes.Status404NotFound);
+                return ResponseModel.Write(null!, ApiMessages.UserNotFound, StatusCodes.Status404NotFound);
             }
 
-            var newUserProperties = new UserProperties();
+            var newUserProperties = new UserProperties
+            {
+                User = user,
+                LastActivity = DateTime.Now,
+                Bio = properties.Bio,
+                Photo = properties.Photo,
+            };
 
-            newUserProperties.User = user;
-            newUserProperties.LastActivity = DateTime.Now;
-            newUserProperties.Bio = properties.Bio;
-            newUserProperties.Photo = properties.Photo;
-            
             await _userRepo.UpdateUserProperties(newUserProperties);
-            
-            return Response<User?>.SuccessUser(null!, ApiMessages.UserUpdated, StatusCodes.Status404NotFound);
+
+            return ResponseModel.Write(user, ApiMessages.UserUpdated, StatusCodes.Status200OK);
         }
         catch (Exception e)
         {
-            return Response<User?>.FailWithException(null!, e.Message, ExceptionService.GetStatusCode(e), e.StackTrace!);
+            throw new Exception(e.Message);
         }
     }
 }
