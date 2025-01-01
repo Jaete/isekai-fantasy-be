@@ -21,7 +21,7 @@ public class UserControllerTests : BaseAPITest
         };
 
         var response = await Client.PostAsync($"{BaseUri}/register", GetContent(userDto));
-        var responseModel = await ResponseSerialize(response) as ResponseModel;
+        var responseModel = await ResponseSerialize(response);
         
         Assert.NotNull(responseModel);
         Assert.Equal(ApiMessages.EmptyCredentials, responseModel.Message);
@@ -39,7 +39,7 @@ public class UserControllerTests : BaseAPITest
         };
 
         var response = await Client.PostAsync($"{BaseUri}/register", GetContent(userDto));
-        var responseModel = await ResponseSerialize(response) as ResponseModel;
+        var responseModel = await ResponseSerialize(response);
         
         Assert.NotNull(responseModel);
         Assert.Equal(ApiMessages.EmailInvalid, responseModel.Message);
@@ -57,7 +57,7 @@ public class UserControllerTests : BaseAPITest
         };
         
         var response = await Client.PostAsync($"{BaseUri}/register", GetContent(userDto));
-        var responseModel = await ResponseSerialize(response) as ResponseModel;
+        var responseModel = await ResponseSerialize(response);
         
         Assert.NotNull(responseModel);
         Assert.Equal(ApiMessages.PasswordInvalidLength, responseModel.Message);
@@ -75,7 +75,7 @@ public class UserControllerTests : BaseAPITest
         };
         
         var response = await Client.PostAsync($"{BaseUri}/register", GetContent(userDto));
-        var responseModel = await ResponseSerialize(response) as ResponseModel;
+        var responseModel = await ResponseSerialize(response);
         
         Assert.NotNull(responseModel);
         Assert.Equal(ApiMessages.PasswordInvalidUpper, responseModel.Message);
@@ -93,7 +93,7 @@ public class UserControllerTests : BaseAPITest
         };
         
         var response = await Client.PostAsync($"{BaseUri}/register", GetContent(userDto));
-        var responseModel = await ResponseSerialize(response) as ResponseModel;
+        var responseModel = await ResponseSerialize(response);
         
         Assert.NotNull(responseModel);
         Assert.Equal(ApiMessages.PasswordInvalidLower, responseModel.Message);
@@ -111,7 +111,7 @@ public class UserControllerTests : BaseAPITest
         };
         
         var response = await Client.PostAsync($"{BaseUri}/register", GetContent(userDto));
-        var responseModel = await ResponseSerialize(response) as ResponseModel;
+        var responseModel = await ResponseSerialize(response);
         
         Assert.NotNull(responseModel);
         Assert.Equal(ApiMessages.PasswordInvalidDigit, responseModel.Message);
@@ -129,7 +129,7 @@ public class UserControllerTests : BaseAPITest
         };
         
         var response = await Client.PostAsync($"{BaseUri}/register", GetContent(userDto));
-        var responseModel = await ResponseSerialize(response) as ResponseModel;
+        var responseModel = await ResponseSerialize(response);
         
         Assert.NotNull(responseModel);
         Assert.Equal(ApiMessages.PasswordInvalidSpecial, responseModel.Message);
