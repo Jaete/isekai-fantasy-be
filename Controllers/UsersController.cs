@@ -2,9 +2,7 @@
 using IsekaiFantasyBE.Models.Users;
 using IsekaiFantasyBE.Models.Response;
 using IsekaiFantasyBE.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OneOf;
 
 namespace IsekaiFantasyBE.Controllers;
 

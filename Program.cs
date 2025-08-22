@@ -1,6 +1,5 @@
 using System.Text;
 using IsekaiFantasyBE.Contexts;
-using IsekaiFantasyBE.Interfaces;
 using IsekaiFantasyBE.Repository;
 using IsekaiFantasyBE.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

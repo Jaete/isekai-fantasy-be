@@ -1,6 +1,4 @@
-﻿using System.Xml;
-
-namespace IsekaiFantasyBE.Models.Response;
+﻿namespace IsekaiFantasyBE.Models.Response;
 
 public class ApiMessages
 {

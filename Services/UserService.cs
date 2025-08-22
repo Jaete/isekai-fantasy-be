@@ -1,12 +1,7 @@
-﻿using System.Diagnostics;
-using System.Net;
-using System.Security.Cryptography;
-using System.Text;
-using IsekaiFantasyBE.Models.DTO;
+﻿using IsekaiFantasyBE.Models.DTO;
 using IsekaiFantasyBE.Models.Response;
 using IsekaiFantasyBE.Models.Users;
 using IsekaiFantasyBE.Repository;
-using OneOf;
 
 namespace IsekaiFantasyBE.Services;
 
@@ -84,77 +79,56 @@ public class UserService
 
     public async Task<ResponseModel> RegisterNewUser(UserDTO userDto)
     {
-        try
+        ValidateCredentials(userDto);
+        
+        var user = new User
         {
-            ValidateCredentials(userDto);
-            
-            var user = new User
-            {
-                Username = userDto.Username!,
-                Email = userDto.Email!,
-                Password = PasswordService.Encrypt(userDto.Password!),
-            };
-            await _userRepo.RegisterNewUser(user);
-            return ResponseModel.Write(user, ApiMessages.UserCreated, StatusCodes.Status201Created);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
-        }
+            Username = userDto.Username!,
+            Email = userDto.Email!,
+            Password = PasswordService.Encrypt(userDto.Password!),
+        };
+        await _userRepo.RegisterNewUser(user);
+        return ResponseModel.Write(user, ApiMessages.UserCreated, StatusCodes.Status201Created);
     }
     
     public async Task<ResponseModel> LoginUser(UserDTO userDto)
     {
-        try
+        ValidateCredentials(userDto);
+        var user = await _userRepo.GetUserByUsername(userDto.Username!);
+        if (user is null)
         {
-            ValidateCredentials(userDto);
-            var user = await _userRepo.GetUserByUsername(userDto.Username!);
-            if (user is null)
-            {
-                return ResponseModel.Write(null!, ApiMessages.UserNotFound, StatusCodes.Status404NotFound);
-            }
-            
-            if(!PasswordService.Verify(userDto.Password!, user.Password))
-            {
-                return ResponseModel.Write(null!, ApiMessages.WrongPassword, StatusCodes.Status400BadRequest);
-            }
+            return ResponseModel.Write(null!, ApiMessages.UserNotFound, StatusCodes.Status404NotFound);
+        }
+        
+        if(!PasswordService.Verify(userDto.Password!, user.Password))
+        {
+            return ResponseModel.Write(null!, ApiMessages.WrongPassword, StatusCodes.Status400BadRequest);
+        }
 
-            var token = JwtService.GenerateJwtToken(user);
-            return ResponseModel.Write(token, ApiMessages.LoginSuccess, StatusCodes.Status200OK);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
-        }
+        var token = JwtService.GenerateJwtToken(user);
+        return ResponseModel.Write(token, ApiMessages.LoginSuccess, StatusCodes.Status200OK);
     }
 
     public async Task<ResponseModel> UpdateProperties(UserPropertiesDTO properties, HttpContext context)
     {
-        try
-        {
-            var userId = JwtService.GetAuthenticatedUserId(context);
-            var user = await _userRepo.GetUserById(userId);
-            
-            if (user is null)
-            {
-                return ResponseModel.Write(null!, ApiMessages.UserNotFound, StatusCodes.Status404NotFound);
-            }
+        var userId = JwtService.GetAuthenticatedUserId(context);
+        var user = await _userRepo.GetUserById(userId);
 
-            var newUserProperties = new UserProperties
+        if (user is null)
+        {
+            return ResponseModel.Write(null!, ApiMessages.UserNotFound, StatusCodes.Status404NotFound);
+        }
+        
+        await _userRepo.UpdateUserProperties(
+            new UserProperties
             {
                 User = user,
                 LastActivity = DateTime.Now,
                 Bio = properties.Bio,
                 Photo = properties.Photo,
-            };
+            }    
+        );
 
-            await _userRepo.UpdateUserProperties(newUserProperties);
-
-            return ResponseModel.Write(user, ApiMessages.UserUpdated, StatusCodes.Status200OK);
-        }
-        catch (Exception e)
-        {
-            throw new Exception(e.Message);
-        }
+        return ResponseModel.Write(user, ApiMessages.UserUpdated, StatusCodes.Status200OK);
     }
 }
