@@ -1,8 +1,9 @@
-﻿using System.Security.Authentication;
+﻿using System.Data;
+using System.Security.Authentication;
 
 namespace IsekaiFantasyBE.Services.Utils;
 
-public static class ExceptionService
+public static class Exceptions
 {
     public static int GetStatusCode(Exception ex)
     {
@@ -11,10 +12,11 @@ public static class ExceptionService
             ArgumentException => StatusCodes.Status400BadRequest,
             InvalidOperationException => StatusCodes.Status400BadRequest,
             FormatException => StatusCodes.Status400BadRequest,
+            DuplicateNameException => StatusCodes.Status422UnprocessableEntity,
             KeyNotFoundException => StatusCodes.Status404NotFound,
             AuthenticationException => StatusCodes.Status401Unauthorized,
             UnauthorizedAccessException => StatusCodes.Status403Forbidden,
             _ => StatusCodes.Status500InternalServerError
         };
-    } 
+    }
 }

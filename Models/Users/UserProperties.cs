@@ -15,10 +15,10 @@ public class UserProperties
     
     [JsonIgnore][ForeignKey("UserId")]
     public User User { get; set; }
-    
+
     [Column(TypeName = DbProperties.Varchar255)]
-    public string? Photo { get; set; }
-    
+    public string? Photo { get; set; } = "https://i.imgur.com/d0RgzSl.png";
+
     [Column(TypeName = DbProperties.Text)]
     public string? Bio { get; set; }
     

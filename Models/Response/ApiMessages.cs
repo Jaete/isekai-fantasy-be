@@ -2,21 +2,23 @@
 
 public class ApiMessages
 {
-    public const string UserRetrieved = "User(s) retrieved successfully";
-    public const string UserNotFound = "User(s) not found";
-    public const string UserCreated = "User registered successfully";
-    public const string EmailInvalid = "Email is invalid";
-    public const string EmailAlreadyExists = "Email already exists";
-    public const string PasswordInvalidLength = "Password must be at least 8 characters long.";
-    public const string PasswordInvalidUpper = "Password must have at least one upper case letter.";
-    public const string PasswordInvalidLower = "Password must have at least one lower case letter.";
-    public const string PasswordInvalidDigit = "Password must have at least one digit.";
-    public const string PasswordInvalidSpecial = "Password must have at least one special character.";
-    public const string EmptyCredentials = "Username and password must not be empty.";
-    public const string WrongPassword = "Password is incorrect.";
-    public const string LoginSuccess = "Login successful.";
-    public const string NotAuthenticated = "Unauthorized. You must be logged in.";
-    public const string InsufficientPermissions = "Unauthorized. Insufficient permissions.";
-    public const string UserUpdated = "User updated successfully.";
-    public const string UserBanned = "User banned successfully.";
+    public const string UserRetrieved = "Usuários encontrados com sucesso.";
+    public const string UserNotFound = "Nenhum usuário encontrado.";
+    public const string UserCreated = "Usuário cadastrado com sucesso.";
+    public const string EmailInvalid = "Email é inválido.";
+    public const string EmailAlreadyExists = "Email já registrado.";
+    public const string PasswordInvalidLength = "Senha deve conter pelo menos 8 caracteres.";
+    public const string PasswordInvalidUpper = "Senha deve conter pelo menos uma letra maiúscula.";
+    public const string PasswordInvalidLower = "Senha deve conter pelo menos uma letra minúscula.";
+    public const string PasswordInvalidDigit = "Senha deve conter pelo menos um número.";
+    public const string PasswordInvalidSpecial = "Senha deve conter pelo menos um caractere especial.";
+    public const string EmptyCredentials = "Identificador (usuário ou email) e senha não podem estar vazios.";
+    public const string WrongPassword = "Senha incorreta.";
+    public const string LoginSuccess = "Login realizado.";
+    public const string NotAuthenticated = "Não autorizado. Você deve estar logado para continuar.";
+    public const string InsufficientPermissions = "Não autorizado. Permissões insuficientes.";
+    public const string UserUpdated = "Usuário atualizado com sucesso.";
+    public const string AlreadyRegistered = "Usuário já cadastrado.";
+    public const string InRegisterProgress = "Usuário já em processo de cadastro. Cheque a caixa de email.";
+    public const string NotInPreRegister = "Usuário não está em processo de cadastro.";
 }

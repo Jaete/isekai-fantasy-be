@@ -19,15 +19,14 @@ public class User
     
     public byte[] Password { get; set; }
     
-    [JsonIgnore][Column(TypeName = DbProperties.Datetime)][DefaultValue(DbProperties.CurrentTimestamp)]
+    [Column(TypeName = DbProperties.Datetime)][DefaultValue(DbProperties.CurrentTimestamp)]
     public DateTime? CreatedAt { get; set; }
     
-    [JsonIgnore][Column(TypeName = DbProperties.Datetime)][DefaultValue(DbProperties.CurrentTimestamp)] 
+    [Column(TypeName = DbProperties.Datetime)][DefaultValue(DbProperties.CurrentTimestamp)] 
     public DateTime? UpdatedAt { get; set; }
     
-    [JsonIgnore][Column(TypeName = DbProperties.Datetime)][DefaultValue(DbProperties.CurrentTimestamp)] 
+    [Column(TypeName = DbProperties.Datetime)][DefaultValue(DbProperties.CurrentTimestamp)] 
     public DateTime? LastLogin { get; set; }
     
-    [JsonIgnore]
     public UserProperties? Properties { get; set; }
 }

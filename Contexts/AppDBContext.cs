@@ -10,6 +10,7 @@ public class AppDBContext : DbContext
     
     public DbSet<User> Users { get; set; }
     public DbSet<UserProperties> UsersProperties { get; set; }
+    public DbSet<PreRegistrationUser> PreRegistrationUsers { get; set; }
     
     public DbSet<BannedUsers> BannedUsers { get; set; }
     
@@ -21,6 +22,16 @@ public class AppDBContext : DbContext
             .ValueGeneratedOnAdd();
 
         modelBuilder.Entity<User>()
+            .Property(u => u.UpdatedAt)
+            .HasDefaultValueSql(DbProperties.CurrentTimestamp)
+            .ValueGeneratedOnAddOrUpdate();
+
+        modelBuilder.Entity<PreRegistrationUser>()
+           .Property(u => u.CreatedAt)
+           .HasDefaultValueSql(DbProperties.CurrentTimestamp)
+           .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<PreRegistrationUser>()
             .Property(u => u.UpdatedAt)
             .HasDefaultValueSql(DbProperties.CurrentTimestamp)
             .ValueGeneratedOnAddOrUpdate();

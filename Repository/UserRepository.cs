@@ -1,6 +1,7 @@
 ﻿using IsekaiFantasyBE.Contexts;
 using IsekaiFantasyBE.Interfaces;
 using IsekaiFantasyBE.Models.Users;
+using IsekaiFantasyBE.Services.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace IsekaiFantasyBE.Repository;
@@ -33,9 +34,27 @@ public class UserRepository : IUserRepository
         return await _dbContext.Users
             .Include(u => u.Properties)
             .FirstOrDefaultAsync(u => u.Email == email);
+        return await _dbContext.Users
+        .Include(u => u.Properties)
+        .FirstOrDefaultAsync(u => u.Email == email);
     }
 
-    public async Task<User?> RegisterNewUser(User user)
+    public async Task<PreRegistrationUser?> PreRegisterUser(PreRegistrationUser user)
+    {
+        try
+        {
+            _dbContext.PreRegistrationUsers.Add(user);
+            await _dbContext.SaveChangesAsync();
+
+            return user;
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
+    }
+
+    public async Task<User?> FinishRegisterUser(Guid token, string password)
     {
         try
         {
@@ -47,6 +66,38 @@ public class UserRepository : IUserRepository
                     Status = UserProperties.ACTIVE,
                 }
             );
+            PreRegistrationUser? preRegister = await _dbContext.PreRegistrationUsers.FirstOrDefaultAsync<PreRegistrationUser>(
+                preReg => preReg.EmailValidationToken == token
+            );
+            if (preRegister is null)
+            {
+                return null;
+            }
+            
+            var encryptedPass = Encryption.Encrypt(password);
+            if (!Encryption.Compare(encryptedPass, preRegister.Password))
+            { 
+                return null;
+            }
+            
+            User user = new User()
+            {
+                Id = preRegister.Id,
+                Email = preRegister.Email,
+                Username = preRegister.Username,
+                Password = preRegister.Password,
+            };
+            
+            var properties = new UserProperties
+            {
+                User = user,
+                Status = UserProperties.ACTIVE,
+            };
+            user.Properties = properties;
+            
+            await _dbContext.Users.AddAsync(user);
+            await _dbContext.UsersProperties.AddAsync(properties);
+            _dbContext.PreRegistrationUsers.Remove(preRegister);
             await _dbContext.SaveChangesAsync();
 
             return user;
@@ -88,5 +139,10 @@ public class UserRepository : IUserRepository
         
         await _dbContext.SaveChangesAsync();
         return bannedUser;
+    }
+
+    public async Task<PreRegistrationUser> GetPreRegisteredUserByEmail(string email)
+    {
+        return await _dbContext.PreRegistrationUsers.FirstOrDefaultAsync(up => up.Email == email);
     }
 }

@@ -1,45 +1,81 @@
-﻿using IsekaiFantasyBE.Models.DTO;
+using IsekaiFantasyBE.Models.DTO;
 using IsekaiFantasyBE.Models.Response;
-using IsekaiFantasyBE.Models.Response.Entities;
 using IsekaiFantasyBE.Models.Users;
 using IsekaiFantasyBE.Repository;
 using IsekaiFantasyBE.Services.Utils;
-using Microsoft.OpenApi.Extensions;
 
 namespace IsekaiFantasyBE.Services;
 
 public class UserService
 {
     private UserRepository _userRepo;
+    private Mailer _emailSenderService;
 
-    public UserService(UserRepository userRepo)
+    public UserService(UserRepository userRepo, Mailer emailSenderService)
     {
         _userRepo = userRepo;
+        _emailSenderService = emailSenderService;
     }
 
-    private static bool ValidateEmptyCredentials(UserDTO user)
+    private static ResponseModel CreateMyselfResponse(User? user)
     {
-        if (user.Username is null || user.Password is null)
+        if (user is null)
         {
-            return false;
+            return ResponseModel.Write(
+                null!,
+                message: ApiMessages.UserNotFound,
+                statusCode: StatusCodes.Status404NotFound
+            );
         }
 
-        return true;
+        var myself = new Myself
+        {
+            Userid = user.Id,
+            Username = user.Username,
+            Email = user.Email,
+            CreatedAt = user.CreatedAt,
+            UpdatedAt = user.UpdatedAt,
+            LastLogin = user.LastLogin,
+            Properties = user.Properties is not null
+                ? new()
+                {
+                    Bio = user.Properties.Bio,
+                    Photo = user.Properties.Photo,
+                    LastActivity = user.Properties.LastActivity,
+                    Status = user.Properties.Status,
+                    UserRole = user.Properties.UserRole
+                }
+                : null
+        };
+
+        return ResponseModel.Write(
+            myself,
+            message: ApiMessages.UserRetrieved,
+            statusCode: StatusCodes.Status200OK
+        );
     }
 
-    private static void ValidateCredentials(UserDTO userDto)
+    private static ResponseModel CreateSingleUserResponse(User? user)
     {
-        if (!ValidateEmptyCredentials(userDto))
+        if (user is null)
         {
-            throw new ArgumentException(ApiMessages.EmptyCredentials);
+            return ResponseModel.Write(null!, ApiMessages.UserNotFound, StatusCodes.Status404NotFound);
         }
-            
-        if (!EmailValidationService.IsValidEmail(userDto.Email))
+
+        return ResponseModel.Write(user, ApiMessages.UserRetrieved, StatusCodes.Status200OK);
+    }
+
+    public async Task<ResponseModel> GetMyself(Guid id)
+    {
+        try
         {
-            throw new ArgumentException(ApiMessages.EmailInvalid);
+            var user = await _userRepo.GetUserById(id);
+            return CreateMyselfResponse(user);
         }
-            
-        PasswordService.Validate(userDto.Password);
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
 
     public async Task<ResponseModel> GetUserById(Guid id)
