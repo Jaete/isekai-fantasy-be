@@ -8,16 +8,38 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// DBContexts
+builder.Services.AddDbContext<AppDBContext>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
+    )
+);
+
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+             .AllowAnyMethod()
+             .AllowAnyHeader();
+    });
+});
+
+// App Services
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AdminService>();
 builder.Services.AddScoped<JwtService>();
 JwtService.Initialize(builder.Configuration);
+builder.Services.AddScoped<Mailer>();
 
+
+// Authentication
 builder.Services.AddAuthentication(
     options =>
     {
@@ -69,6 +91,7 @@ builder.Services.AddAuthentication(
     };
 });
 
+// Controllers and Swagger
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -125,6 +148,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseAuthentication();
+app.UseCors("AllowFrontend");
+
+app.UseRouting();
+
 app.UseAuthorization();
 
 app.MapControllers();

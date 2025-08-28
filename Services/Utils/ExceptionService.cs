@@ -3,7 +3,7 @@ using System.Security.Authentication;
 
 namespace IsekaiFantasyBE.Services.Utils;
 
-public static class Exceptions
+public static class ExceptionService
 {
     public static int GetStatusCode(Exception ex)
     {

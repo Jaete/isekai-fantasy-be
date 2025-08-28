@@ -3,19 +3,12 @@ using IsekaiFantasyBE.Models.Users;
 
 namespace IsekaiFantasyBE.Models.DTO;
 
-public class Myself
-{
-    public Guid Userid { get; set; }
-
-    public string? Username { get; set; }
-
-    [EmailAddress] public string? Email { get; set; }
-
-    public UserProperties? Properties { get; set; }
-
-    public DateTime? CreatedAt { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public DateTime? LastLogin { get; set; }
-}
+public record Myself (
+    Guid Userid, 
+    string Username,
+    [EmailAddress] string? Email,
+    UserProperties? Properties,
+    DateTime? CreatedAt,
+    DateTime? UpdatedAt,
+    DateTime? LastLogin
+);

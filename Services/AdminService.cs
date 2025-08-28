@@ -60,16 +60,16 @@ public class AdminService
         return ResponseService.Ok(
             new BannedResponse(
                 BannedUser: new UserResponse(
-                    Id: bannedUser.User.Id,
-                    Username: bannedUser.User.Username
+                    bannedUser.User.Id,
+                    bannedUser.User.Username
                 ),
                 BannedBy: new UserResponse(
-                    Id: bannedUser.BannedBy.Id,
-                    Username: bannedUser.BannedBy.Username
+                    bannedUser.BannedBy.Id,
+                    bannedUser.BannedBy.Username
                 ),
-                Reason: banUserProps.Reason,
-                BannedAt: bannedUser.BannedAt,
-                BannedUntil: banUserProps.BannedUntil
+                bannedUser.BannedAt,
+                banUserProps.BannedUntil,
+                banUserProps.Reason
             ),
             ApiMessages.UserBanned
         );

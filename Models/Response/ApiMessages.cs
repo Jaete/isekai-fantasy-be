@@ -21,4 +21,6 @@ public class ApiMessages
     public const string AlreadyRegistered = "Usuário já cadastrado.";
     public const string InRegisterProgress = "Usuário já em processo de cadastro. Cheque a caixa de email.";
     public const string NotInPreRegister = "Usuário não está em processo de cadastro.";
+    public const string UserBanned = "Usuário banido.";
+    public const string PropertiesNotFound = "Propriedades do usuário não existem.";
 }

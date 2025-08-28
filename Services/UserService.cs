@@ -1,5 +1,6 @@
 using IsekaiFantasyBE.Models.DTO;
 using IsekaiFantasyBE.Models.Response;
+using IsekaiFantasyBE.Models.Response.Entities;
 using IsekaiFantasyBE.Models.Users;
 using IsekaiFantasyBE.Repository;
 using IsekaiFantasyBE.Services.Utils;
@@ -15,54 +16,6 @@ public class UserService
     {
         _userRepo = userRepo;
         _emailSenderService = emailSenderService;
-    }
-
-    private static ResponseModel CreateMyselfResponse(User? user)
-    {
-        if (user is null)
-        {
-            return ResponseModel.Write(
-                null!,
-                message: ApiMessages.UserNotFound,
-                statusCode: StatusCodes.Status404NotFound
-            );
-        }
-
-        var myself = new Myself
-        {
-            Userid = user.Id,
-            Username = user.Username,
-            Email = user.Email,
-            CreatedAt = user.CreatedAt,
-            UpdatedAt = user.UpdatedAt,
-            LastLogin = user.LastLogin,
-            Properties = user.Properties is not null
-                ? new()
-                {
-                    Bio = user.Properties.Bio,
-                    Photo = user.Properties.Photo,
-                    LastActivity = user.Properties.LastActivity,
-                    Status = user.Properties.Status,
-                    UserRole = user.Properties.UserRole
-                }
-                : null
-        };
-
-        return ResponseModel.Write(
-            myself,
-            message: ApiMessages.UserRetrieved,
-            statusCode: StatusCodes.Status200OK
-        );
-    }
-
-    private static ResponseModel CreateSingleUserResponse(User? user)
-    {
-        if (user is null)
-        {
-            return ResponseModel.Write(null!, ApiMessages.UserNotFound, StatusCodes.Status404NotFound);
-        }
-
-        return ResponseModel.Write(user, ApiMessages.UserRetrieved, StatusCodes.Status200OK);
     }
 
     public async Task<ResponseModel> GetMyself(Guid id)
@@ -99,10 +52,7 @@ public class UserService
 
     public async Task<ResponseModel> GetUserByEmail(string email)
     {
-        if (!EmailValidationService.IsValidEmail(email))
-        {
-            return ResponseService.BadRequest(ApiMessages.EmailInvalid);
-        }
+        EmailValidationService.IsValidEmail(email);
         
         var user = await _userRepo.GetUserByEmail(email);
         return user is null 
@@ -138,22 +88,47 @@ public class UserService
             );
     }
 
-    public async Task<ResponseModel> RegisterNewUser(UserDTO userDto)
+    public async Task<ResponseModel> PreRegisterUser(UserDTO userDto)
     {
-        ValidateCredentials(userDto);
-        
-        var user = new User
+        if (!Credentials.Validate(userDto))
         {
-            Username = userDto.Username!,
-            Email = userDto.Email!,
-            Password = PasswordService.Encrypt(userDto.Password!),
-        };
-        await _userRepo.RegisterNewUser(user);
+            throw new ArgumentException(ApiMessages.EmptyCredentials);
+        }
+
+        var alreadyRegistered = await _userRepo.GetUserByEmail(userDto.Email!) != null;
+        var alreadyInPreRegister = await _userRepo.GetPreRegisteredUserByEmail(userDto.Email!) != null;
+
+        if (alreadyRegistered || alreadyInPreRegister)
+        {
+            return ResponseService.UnprocessableEntity(
+                alreadyRegistered 
+                    ? ApiMessages.AlreadyRegistered 
+                    : ApiMessages.InRegisterProgress
+            );
+        }
         
-        return ResponseService.Created(
-            new UserResponse(user.Id, user.Username),
-            ApiMessages.UserCreated
-        );
+        var preRegister = new PreRegistrationUser
+        {
+            Email = userDto.Email!,
+            Username = userDto.Username!,
+            Password = Encryption.Encrypt(userDto.Password!),
+            EmailValidationToken = Guid.NewGuid(),
+        };
+
+        await _userRepo.PreRegisterUser(preRegister);
+
+        _emailSenderService.SendEmailVerification(preRegister);
+
+        return ResponseService.Ok(preRegister, ApiMessages.UserCreated);
+    }
+    
+    public async Task<ResponseModel> FinishRegisterUser(UserConfirmationDTO dto)
+    {
+        var user = await _userRepo.FinishRegisterUser(dto.Token, dto.Password);
+
+        return user is null 
+            ? ResponseService.NotFound(ApiMessages.NotInPreRegister)
+            : ResponseService.Created(user, ApiMessages.UserCreated);
     }
     
     public async Task<ResponseModel> LoginUser(UserDTO userDto)
@@ -197,5 +172,55 @@ public class UserService
         return ResponseService.Ok(
             new UserResponse(user.Id, user.Username), ApiMessages.UserUpdated
         );
+    }
+    
+    
+    
+    private static ResponseModel CreateMyselfResponse(User? user)
+    {
+        if (user is null)
+        {
+            return ResponseService.NotFound(ApiMessages.UserNotFound);
+        }
+
+        var myself = new Myself
+        (
+            user.Id,
+            user.Username,
+            user.Email,
+            user.Properties is not null
+                ? new UserProperties
+                {
+                    Bio = user.Properties.Bio,
+                    Photo = user.Properties.Photo,
+                    LastActivity = user.Properties.LastActivity,
+                    Status = user.Properties.Status,
+                    UserRole = user.Properties.UserRole
+                }
+                : null,
+            user.CreatedAt,
+            user.UpdatedAt,
+            user.LastLogin
+        );
+
+        return ResponseService.Ok(
+            myself,
+            message: ApiMessages.UserRetrieved
+        );
+    }
+    
+    private static void ValidateEmptyCredentials(UserDTO user)
+    {
+        if (user.Username is null || user.Password is null)
+        {
+            throw new ArgumentException(ApiMessages.EmptyCredentials);
+        }
+    }
+
+    private static void ValidateCredentials(UserDTO userDto)
+    {
+        ValidateEmptyCredentials(userDto);
+        EmailValidationService.IsValidEmail(userDto.Email);
+        PasswordService.Validate(userDto.Password);
     }
 }

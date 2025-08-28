@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using IsekaiFantasyBE.Models.Response;
 
 namespace IsekaiFantasyBE.Services.Utils;
 
@@ -8,13 +9,11 @@ public class EmailValidationService
         @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
         RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-    public static bool IsValidEmail(string? email)
+    public static void IsValidEmail(string? email)
     {
-        if (string.IsNullOrWhiteSpace(email))
+        if (string.IsNullOrWhiteSpace(email) || !EmailRegex.IsMatch(email))
         {
-            return false;
+            throw new ArgumentException(ApiMessages.EmailInvalid);
         }
-
-        return EmailRegex.IsMatch(email);
     }
 }

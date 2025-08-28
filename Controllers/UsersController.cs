@@ -29,7 +29,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var response = await _userService.GetMyself(JwtAuth.GetAuthenticatedUserId(HttpContext));
+            var response = await _userService.GetMyself(JwtService.GetAuthenticatedUserId(HttpContext));
             return response.StatusCode switch
             {
                 StatusCodes.Status401Unauthorized => Unauthorized(response),
@@ -41,10 +41,11 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
+            var statusCode = ExceptionService.GetStatusCode(e);
             return StatusCode(
-                Exceptions.GetStatusCode(e),
-                ResponseModel.Write(e.InnerException!, e.Message, Exceptions.GetStatusCode(e), e.StackTrace
-            ));
+                statusCode,
+                ResponseService.InternalError(e.InnerException.Message, statusCode, e.StackTrace)
+            );
         }
     }
 
@@ -169,10 +170,11 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
+            var statusCode = ExceptionService.GetStatusCode(e);
             return StatusCode(
-                Exceptions.GetStatusCode(e),
-                ResponseModel.Write(e.InnerException!, e.Message, Exceptions.GetStatusCode(e), e.StackTrace
-            ));
+                statusCode,
+                ResponseService.InternalError(e.Message, statusCode, e.StackTrace)
+            );
         }
     }
 

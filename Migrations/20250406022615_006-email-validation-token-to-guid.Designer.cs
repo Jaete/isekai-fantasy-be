@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace IsekaiFantasyBE.Migrations
 {
-    [DbContext(typeof(UserDbContext))]
+    [DbContext(typeof(AppDBContext))]
     [Migration("20250406022615_006-email-validation-token-to-guid")]
     partial class _006emailvalidationtokentoguid
     {

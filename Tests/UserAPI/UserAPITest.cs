@@ -1,6 +1,5 @@
 ﻿using IsekaiFantasyBE.Models.DTO;
 using IsekaiFantasyBE.Models.Response;
-using Microsoft.AspNetCore.Http;
 using UserAPI.Tests;
 using Xunit;
 

@@ -1,8 +1,4 @@
-using System.Diagnostics;
 using IsekaiFantasyBE.Models.Response;
-using IsekaiFantasyBE.Models.Response.Entities;
-using IsekaiFantasyBE.Models.Users;
-using OneOf.Types;
 
 namespace IsekaiFantasyBE.Services;
 
@@ -34,6 +30,11 @@ public class ResponseService
     public static ResponseModel NotFound(string message)
     {
         return ResponseModel.Write(null!, message, StatusCodes.Status404NotFound);
+    }
+
+    public static ResponseModel UnprocessableEntity(string message)
+    {
+        return ResponseModel.Write(null!, message, StatusCodes.Status422UnprocessableEntity);
     }
 
     public static ResponseModel InternalError(string message, int statusCode, string stackTrace)

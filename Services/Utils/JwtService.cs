@@ -61,7 +61,7 @@ public class JwtService
     }
     public static void RequireAuthentication(HttpContext context)
     {
-        if (context.Request.Headers.Authorization.IsNullOrEmpty())
+        if (context.Request.Headers.Authorization.Count == 0)
         {
             throw new AuthenticationException(ApiMessages.NotAuthenticated);
         }

@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace IsekaiFantasyBE.Models.DTO;
 
 public class UserConfirmationDTO

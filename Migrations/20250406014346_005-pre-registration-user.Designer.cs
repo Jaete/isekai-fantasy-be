@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace IsekaiFantasyBE.Migrations
 {
-    [DbContext(typeof(UserDbContext))]
+    [DbContext(typeof(AppDBContext))]
     [Migration("20250406014346_005-pre-registration-user")]
     partial class _005preregistrationuser
     {

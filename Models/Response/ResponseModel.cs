@@ -7,7 +7,7 @@ public class ResponseModel
     public int StatusCode { get; set; }
     public string? StackTrace { get; set; }
 
-    public static ResponseModel Write(object value, string message, int statusCode, string? stack = null)
+    public static ResponseModel Write(object? value, string message, int statusCode, string? stack = null)
     {
         return new ResponseModel
         {
