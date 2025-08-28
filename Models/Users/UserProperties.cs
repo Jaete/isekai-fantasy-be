@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using IsekaiFantasyBE.Database;
 
 namespace IsekaiFantasyBE.Models.Users;
@@ -11,12 +12,12 @@ public class UserProperties
     
     public int Id { get; set; }
     
-    [ForeignKey("UserId")]
+    [JsonIgnore][ForeignKey("UserId")]
     public User User { get; set; }
-    
+
     [Column(TypeName = DbProperties.Varchar255)]
-    public string? Photo { get; set; }
-    
+    public string? Photo { get; set; } = "https://i.imgur.com/d0RgzSl.png";
+
     [Column(TypeName = DbProperties.Text)]
     public string? Bio { get; set; }
     

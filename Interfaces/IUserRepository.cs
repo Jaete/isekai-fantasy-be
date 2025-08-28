@@ -11,5 +11,5 @@ public interface IUserRepository
 
     Task<User?> GetUserByEmail(string email);
 
-    Task<User?> RegisterNewUser(User user);
+    Task<PreRegistrationUser?> PreRegisterUser(PreRegistrationUser user);
 }

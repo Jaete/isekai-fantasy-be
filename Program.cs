@@ -1,8 +1,8 @@
 using System.Text;
 using IsekaiFantasyBE.Contexts;
-using IsekaiFantasyBE.Interfaces;
 using IsekaiFantasyBE.Repository;
 using IsekaiFantasyBE.Services;
+using IsekaiFantasyBE.Services.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -10,11 +10,35 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// DBContexts
+builder.Services.AddDbContext<UserDbContext>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
+    )
+);
+
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+             .AllowAnyMethod()
+             .AllowAnyHeader();
+    });
+});
+
+// App Services
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<JwtService>();
-JwtService.Initialize(builder.Configuration);
+builder.Services.AddScoped<Mailer>();
 
+builder.Services.AddScoped<JwtAuth>();
+JwtAuth.Initialize(builder.Configuration);
+
+
+// Authentication
 builder.Services.AddAuthentication(
     options =>
     {
@@ -39,6 +63,7 @@ builder.Services.AddAuthentication(
     options.SaveToken = true;
 });
 
+// Controllers and Swagger
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -75,10 +100,6 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.AddDbContext<UserDbContext>(options =>
-    options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-
 
 var app = builder.Build();
 
@@ -91,6 +112,10 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty;
     });
 }
+
+app.UseCors("AllowFrontend");
+
+app.UseRouting();
 
 app.UseAuthorization();
 
