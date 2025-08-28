@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using IsekaiFantasyBE.Database;
 
 namespace IsekaiFantasyBE.Models.Users;
@@ -9,9 +10,10 @@ public class UserProperties
     public const string ACTIVE = "active";
     public enum Role { Admin = 0, Member, Moderation, Narrator, }
     
+    [JsonIgnore]
     public int Id { get; set; }
     
-    [ForeignKey("UserId")]
+    [JsonIgnore][ForeignKey("UserId")]
     public User User { get; set; }
     
     [Column(TypeName = DbProperties.Varchar255)]

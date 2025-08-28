@@ -2,6 +2,7 @@
 using IsekaiFantasyBE.Models.Users;
 using IsekaiFantasyBE.Models.Response;
 using IsekaiFantasyBE.Services;
+using IsekaiFantasyBE.Services.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IsekaiFantasyBE.Controllers;
@@ -42,10 +43,11 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
+            var statusCode = ExceptionService.GetStatusCode(e);
             return StatusCode(
-                ExceptionService.GetStatusCode(e),
-                ResponseModel.Write(e.InnerException!, e.Message, ExceptionService.GetStatusCode(e), e.StackTrace
-            ));
+                statusCode,
+                ResponseService.InternalError(e.InnerException?.Message!, statusCode, e.InnerException?.StackTrace!)
+            );
         }
         
     }
@@ -75,10 +77,11 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
+            var statusCode = ExceptionService.GetStatusCode(e);
             return StatusCode(
-                ExceptionService.GetStatusCode(e),
-                ResponseModel.Write(e.InnerException!, e.Message, ExceptionService.GetStatusCode(e), e.StackTrace
-            ));
+                statusCode,
+                ResponseService.InternalError(e.InnerException?.Message!, statusCode, e.InnerException?.StackTrace!)
+            );
         }
     }
 
@@ -105,10 +108,11 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
+            var statusCode = ExceptionService.GetStatusCode(e);
             return StatusCode(
-                ExceptionService.GetStatusCode(e),
-                ResponseModel.Write(e.InnerException!, e.Message, ExceptionService.GetStatusCode(e), e.StackTrace
-            ));
+                statusCode,
+                ResponseService.InternalError(e.InnerException?.Message!, statusCode, e.InnerException?.StackTrace!)
+            );
         }
     }
     
@@ -133,10 +137,11 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
+            var statusCode = ExceptionService.GetStatusCode(e);
             return StatusCode(
-                ExceptionService.GetStatusCode(e),
-                ResponseModel.Write(e.InnerException!, e.Message, ExceptionService.GetStatusCode(e), e.StackTrace
-            ));
+                statusCode,
+                ResponseService.InternalError(e.InnerException?.Message!, statusCode, e.InnerException?.StackTrace!)
+            );
         }
     }
     
@@ -151,7 +156,6 @@ public class UsersController : ControllerBase
         try
         {
             var response = await _userService.LoginUser(userDto);
-
             return response.StatusCode switch
             {
                 StatusCodes.Status400BadRequest => BadRequest(response),
@@ -162,21 +166,22 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
+            var statusCode = ExceptionService.GetStatusCode(e);
             return StatusCode(
-                ExceptionService.GetStatusCode(e),
-                ResponseModel.Write(e.InnerException!, e.Message, ExceptionService.GetStatusCode(e), e.StackTrace
-            ));
+                statusCode,
+                ResponseService.InternalError(e.InnerException?.Message!, statusCode, e.InnerException?.StackTrace!)
+            );
         }
     }
 
     [HttpPut]
-    [Route("update/{id}")]
+    [Route("update")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<ResponseModel>> UpdateProperties(string id, [FromBody] UserPropertiesDTO userProperties)
+    public async Task<ActionResult<ResponseModel>> UpdateProperties([FromBody] UserPropertiesDTO userProperties)
     {
         try
         {
@@ -192,10 +197,11 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
+            var statusCode = ExceptionService.GetStatusCode(e);
             return StatusCode(
-                ExceptionService.GetStatusCode(e),
-                ResponseModel.Write(e.InnerException!, e.Message, ExceptionService.GetStatusCode(e), e.StackTrace
-            ));
+                statusCode,
+                ResponseService.InternalError(e.InnerException?.Message!, statusCode, e.InnerException?.StackTrace!)
+            );
         }
     }
 }

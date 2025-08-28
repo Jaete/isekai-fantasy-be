@@ -18,4 +18,5 @@ public class ApiMessages
     public const string NotAuthenticated = "Unauthorized. You must be logged in.";
     public const string InsufficientPermissions = "Unauthorized. Insufficient permissions.";
     public const string UserUpdated = "User updated successfully.";
+    public const string UserBanned = "User banned successfully.";
 }

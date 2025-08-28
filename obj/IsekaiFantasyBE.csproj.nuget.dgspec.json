@@ -48,13 +48,13 @@
               "target": "Package",
               "version": "[6.0.0, )"
             },
-            "MySql.EntityFrameworkCore": {
-              "target": "Package",
-              "version": "[8.0.8, )"
-            },
             "OneOf": {
               "target": "Package",
               "version": "[3.0.271, )"
+            },
+            "Pomelo.EntityFrameworkCore.MySql": {
+              "target": "Package",
+              "version": "[6.0.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",

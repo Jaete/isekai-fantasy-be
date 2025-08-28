@@ -2,7 +2,7 @@
 using System.Text;
 using IsekaiFantasyBE.Models.Response;
 
-namespace IsekaiFantasyBE.Services;
+namespace IsekaiFantasyBE.Services.Utils;
 
 public static class PasswordService
 {

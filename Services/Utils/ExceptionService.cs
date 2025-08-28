@@ -1,6 +1,6 @@
 ﻿using System.Security.Authentication;
 
-namespace IsekaiFantasyBE.Services;
+namespace IsekaiFantasyBE.Services.Utils;
 
 public static class ExceptionService
 {
@@ -13,6 +13,7 @@ public static class ExceptionService
             FormatException => StatusCodes.Status400BadRequest,
             KeyNotFoundException => StatusCodes.Status404NotFound,
             AuthenticationException => StatusCodes.Status401Unauthorized,
+            UnauthorizedAccessException => StatusCodes.Status403Forbidden,
             _ => StatusCodes.Status500InternalServerError
         };
     } 

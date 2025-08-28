@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace IsekaiFantasyBE.Services;
+namespace IsekaiFantasyBE.Services.Utils;
 
 public class EmailValidationService
 {

@@ -1,7 +1,10 @@
 ﻿using IsekaiFantasyBE.Models.DTO;
 using IsekaiFantasyBE.Models.Response;
+using IsekaiFantasyBE.Models.Response.Entities;
 using IsekaiFantasyBE.Models.Users;
 using IsekaiFantasyBE.Repository;
+using IsekaiFantasyBE.Services.Utils;
+using Microsoft.OpenApi.Extensions;
 
 namespace IsekaiFantasyBE.Services;
 
@@ -12,21 +15,6 @@ public class UserService
     public UserService(UserRepository userRepo)
     {
         _userRepo = userRepo;
-    }
-    
-    private static ResponseModel CreateSingleUserResponse(User? user)
-    {
-        if (user is null)
-        {
-            return ResponseModel.Write(null!, ApiMessages.UserNotFound, StatusCodes.Status404NotFound);
-        }
-
-        return ResponseModel.Write(user, ApiMessages.UserRetrieved, StatusCodes.Status200OK);
-    }
-    
-    private static ResponseModel CreateEmailInvalidResponse(string email)
-    {
-        return ResponseModel.Write(null!, ApiMessages.EmailInvalid, StatusCodes.Status400BadRequest)!;
     }
 
     private static bool ValidateEmptyCredentials(UserDTO user)
@@ -57,24 +45,61 @@ public class UserService
     public async Task<ResponseModel> GetUserById(Guid id)
     {
         var user = await _userRepo.GetUserById(id);
-        return CreateSingleUserResponse(user);
+        
+        return user is null 
+            ? ResponseService.NotFound(ApiMessages.UserNotFound)
+            : ResponseService.Ok(
+            new UserResponse(
+                user.Id,
+                user.Username,
+                user.Properties,
+                user.CreatedAt,
+                user.UpdatedAt,
+                user.LastLogin
+            ),
+            ApiMessages.UserRetrieved
+        );
     }
 
     public async Task<ResponseModel> GetUserByEmail(string email)
     {
         if (!EmailValidationService.IsValidEmail(email))
         {
-            return CreateEmailInvalidResponse(email);
+            return ResponseService.BadRequest(ApiMessages.EmailInvalid);
         }
         
         var user = await _userRepo.GetUserByEmail(email);
-        return CreateSingleUserResponse(user);
+        return user is null 
+            ? ResponseService.NotFound(ApiMessages.UserNotFound) 
+            : ResponseService.Ok(
+                new UserResponse(
+                    user.Id,
+                    user.Username,
+                    user.Properties,
+                    user.CreatedAt,
+                    user.UpdatedAt,
+                    user.LastLogin
+                ),
+                ApiMessages.UserRetrieved
+            );
     }
 
     public async Task<ResponseModel> GetUserByUsername(string username, HttpContext context)
     {
         var user = await _userRepo.GetUserByUsername(username);
-        return CreateSingleUserResponse(user);
+        return user is null 
+            ? ResponseService.NotFound(ApiMessages.UserNotFound) 
+            : ResponseService.Ok(
+                new UserResponse(
+                    user.Id,
+                    user.Username,
+                    user.Properties,
+                    user.CreatedAt,
+                    user.UpdatedAt,
+                    user.LastLogin
+                ),
+                ApiMessages.UserRetrieved
+            );
     }
 
     public async Task<ResponseModel> RegisterNewUser(UserDTO userDto)
@@ -88,7 +113,11 @@ public class UserService
             Password = PasswordService.Encrypt(userDto.Password!),
         };
         await _userRepo.RegisterNewUser(user);
-        return ResponseModel.Write(user, ApiMessages.UserCreated, StatusCodes.Status201Created);
+        
+        return ResponseService.Created(
+            new UserResponse(user.Id, user.Username),
+            ApiMessages.UserCreated
+        );
     }
     
     public async Task<ResponseModel> LoginUser(UserDTO userDto)
@@ -97,16 +126,16 @@ public class UserService
         var user = await _userRepo.GetUserByUsername(userDto.Username!);
         if (user is null)
         {
-            return ResponseModel.Write(null!, ApiMessages.UserNotFound, StatusCodes.Status404NotFound);
+            return ResponseService.NotFound(ApiMessages.UserNotFound);
         }
         
         if(!PasswordService.Verify(userDto.Password!, user.Password))
         {
-            return ResponseModel.Write(null!, ApiMessages.WrongPassword, StatusCodes.Status400BadRequest);
+            return ResponseService.BadRequest(ApiMessages.WrongPassword);
         }
 
         var token = JwtService.GenerateJwtToken(user);
-        return ResponseModel.Write(token, ApiMessages.LoginSuccess, StatusCodes.Status200OK);
+        return ResponseService.Ok(token, ApiMessages.LoginSuccess);
     }
 
     public async Task<ResponseModel> UpdateProperties(UserPropertiesDTO properties, HttpContext context)
@@ -116,7 +145,7 @@ public class UserService
 
         if (user is null)
         {
-            return ResponseModel.Write(null!, ApiMessages.UserNotFound, StatusCodes.Status404NotFound);
+            return ResponseService.NotFound(ApiMessages.UserNotFound);
         }
         
         await _userRepo.UpdateUserProperties(
@@ -129,6 +158,8 @@ public class UserService
             }    
         );
 
-        return ResponseModel.Write(user, ApiMessages.UserUpdated, StatusCodes.Status200OK);
+        return ResponseService.Ok(
+            new UserResponse(user.Id, user.Username), ApiMessages.UserUpdated
+        );
     }
 }

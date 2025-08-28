@@ -1,0 +1,17 @@
+{
+  "user": {
+      "id": "B0B0B0B0-B0B0-B0B0-B0B0-B0B0B0B0B0B0",
+    "username": "User",
+    "email": "user@user.com",
+    "password": "USERuser123!!"
+  },
+  "admin": {
+    "id": "A0A0A0A0-A0A0-A0A0-A0A0-A0A0A0A0A0A0",
+    "username": "admin",
+    "email": "admin@user.com",
+    "password": "ADMIROadmiro123!!"
+  },
+  "banned": {
+    "id": "C0C0C0C0-C0C0-C0C0-C0C0-C0C0C0C0C0C0"
+  }
+}
