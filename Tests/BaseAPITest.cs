@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
 using IsekaiFantasyBE.Models.Response;
-using Microsoft.Extensions.Configuration;
 
 namespace UserAPI.Tests;
 

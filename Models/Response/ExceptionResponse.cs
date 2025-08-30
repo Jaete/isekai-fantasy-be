@@ -1,4 +1,4 @@
-﻿using IsekaiFantasyBE.Services.Utils;
+using IsekaiFantasyBE.Services.Utils;
 
 namespace IsekaiFantasyBE.Models.Response;
 
@@ -12,6 +12,6 @@ public class ExceptionResponse
         {
             Exception = ex.GetBaseException().InnerException;
             Message = ex.Message;
-            StatusCode = Exceptions.GetStatusCode(ex);
+            StatusCode = ExceptionService.GetStatusCode(ex);
         }
 }

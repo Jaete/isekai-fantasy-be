@@ -1,5 +1,6 @@
 ﻿using IsekaiFantasyBE.Contexts;
 using IsekaiFantasyBE.Interfaces;
+using IsekaiFantasyBE.Models.Response;
 using IsekaiFantasyBE.Models.Users;
 using IsekaiFantasyBE.Services.Utils;
 using Microsoft.EntityFrameworkCore;
@@ -8,9 +9,9 @@ namespace IsekaiFantasyBE.Repository;
 
 public class UserRepository : IUserRepository
 {
-    private UserDbContext _dbContext;
+    private AppDBContext _dbContext;
     
-    public UserRepository(UserDbContext dbContext)
+    public UserRepository(AppDBContext dbContext)
     {
         _dbContext = dbContext;
     }
@@ -18,22 +19,22 @@ public class UserRepository : IUserRepository
     public async Task<User?> GetUserById(Guid id)
     {
         return await _dbContext.Users
-        .Include(u => u.Properties)
-        .FirstOrDefaultAsync(u => u.Id == id);
+            .Include(u => u.Properties)
+            .FirstOrDefaultAsync(u => u.Id == id);
     }
 
     public async Task<User?> GetUserByUsername(string username)
     {
         return await _dbContext.Users
-        .Include(u => u.Properties)
-        .FirstOrDefaultAsync(u => u.Username == username);
+            .Include(u => u.Properties)
+            .FirstOrDefaultAsync(u => u.Username == username);
     }
 
     public async Task<User?> GetUserByEmail(string email)
     {
         return await _dbContext.Users
-        .Include(u => u.Properties)
-        .FirstOrDefaultAsync(u => u.Email == email);
+            .Include(u => u.Properties)
+            .FirstOrDefaultAsync(u => u.Email == email);
     }
 
     public async Task<PreRegistrationUser?> PreRegisterUser(PreRegistrationUser user)
@@ -55,7 +56,7 @@ public class UserRepository : IUserRepository
     {
         try
         {
-            PreRegistrationUser? preRegister = await _dbContext.PreRegistrationUsers.FirstOrDefaultAsync<PreRegistrationUser>(
+            PreRegistrationUser? preRegister = await _dbContext.PreRegistrationUsers.FirstOrDefaultAsync(
                 preReg => preReg.EmailValidationToken == token
             );
             if (preRegister is null)
@@ -88,9 +89,10 @@ public class UserRepository : IUserRepository
             await _dbContext.UsersProperties.AddAsync(properties);
             _dbContext.PreRegistrationUsers.Remove(preRegister);
             await _dbContext.SaveChangesAsync();
+
             return user;
-        } 
-        catch (Exception e) 
+        }
+        catch (Exception e)
         {
             throw new Exception(e.Message);
         }
@@ -99,20 +101,37 @@ public class UserRepository : IUserRepository
     public async Task UpdateUserProperties(UserProperties newUserProperties)
     {
         var properties = await _dbContext.UsersProperties.FirstOrDefaultAsync(up => up.User.Id == newUserProperties.User.Id);
-        if (properties == null)
+        if (properties is null)
         {
-            throw new Exception("User properties not found");
+            throw new KeyNotFoundException(ApiMessages.PropertiesNotFound);
         }
         
-        properties.Bio = newUserProperties.Bio;
-        properties.Photo = newUserProperties.Photo;
+        properties.Bio = newUserProperties.Bio ?? properties.Bio;
+        properties.Photo = newUserProperties.Photo ?? properties.Photo;
         properties.LastActivity = DateTime.Now;
 
         _dbContext.UsersProperties.Update(properties);
         await _dbContext.SaveChangesAsync();
     }
 
-    public async Task<PreRegistrationUser> GetPreRegisteredUserByEmail(string email)
+    public async Task<BannedUsers> BanUser(User user, User bannedBy, DateTime bannedUntil, string reason)
+    {
+        var bannedUser = new BannedUsers()
+        {
+            User = user,
+            BannedBy = bannedBy,
+            BannedUntil = bannedUntil,
+            BannedAt = DateTime.Now,
+            Reason = reason
+        };
+        
+        _dbContext.BannedUsers.Add(bannedUser);
+        
+        await _dbContext.SaveChangesAsync();
+        return bannedUser;
+    }
+
+    public async Task<PreRegistrationUser?> GetPreRegisteredUserByEmail(string email)
     {
         return await _dbContext.PreRegistrationUsers.FirstOrDefaultAsync(up => up.Email == email);
     }

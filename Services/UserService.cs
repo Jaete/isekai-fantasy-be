@@ -1,6 +1,6 @@
-﻿using System.Data;
 using IsekaiFantasyBE.Models.DTO;
 using IsekaiFantasyBE.Models.Response;
+using IsekaiFantasyBE.Models.Response.Entities;
 using IsekaiFantasyBE.Models.Users;
 using IsekaiFantasyBE.Repository;
 using IsekaiFantasyBE.Services.Utils;
@@ -18,54 +18,6 @@ public class UserService
         _emailSenderService = emailSenderService;
     }
 
-    private static ResponseModel CreateMyselfResponse(User? user)
-    {
-        if (user is null)
-        {
-            return ResponseModel.Write(
-                null!,
-                message: ApiMessages.UserNotFound,
-                statusCode: StatusCodes.Status404NotFound
-            );
-        }
-
-        var myself = new Myself
-        {
-            Userid = user.Id,
-            Username = user.Username,
-            Email = user.Email,
-            CreatedAt = user.CreatedAt,
-            UpdatedAt = user.UpdatedAt,
-            LastLogin = user.LastLogin,
-            Properties = user.Properties is not null
-                ? new()
-                {
-                    Bio = user.Properties.Bio,
-                    Photo = user.Properties.Photo,
-                    LastActivity = user.Properties.LastActivity,
-                    Status = user.Properties.Status,
-                    UserRole = user.Properties.UserRole
-                }
-                : null
-        };
-
-        return ResponseModel.Write(
-            myself,
-            message: ApiMessages.UserRetrieved,
-            statusCode: StatusCodes.Status200OK
-        );
-    }
-
-    private static ResponseModel CreateSingleUserResponse(User? user)
-    {
-        if (user is null)
-        {
-            return ResponseModel.Write(null!, ApiMessages.UserNotFound, StatusCodes.Status404NotFound);
-        }
-
-        return ResponseModel.Write(user, ApiMessages.UserRetrieved, StatusCodes.Status200OK);
-    }
-
     public async Task<ResponseModel> GetMyself(Guid id)
     {
         try
@@ -81,163 +33,194 @@ public class UserService
 
     public async Task<ResponseModel> GetUserById(Guid id)
     {
-        try
-        {
-            var user = await _userRepo.GetUserById(id);
-            return CreateSingleUserResponse(user);
-        }
-        catch
-        {
-            throw;
-        }
+        var user = await _userRepo.GetUserById(id);
+        
+        return user is null 
+            ? ResponseService.NotFound(ApiMessages.UserNotFound)
+            : ResponseService.Ok(
+            new UserResponse(
+                user.Id,
+                user.Username,
+                user.Properties,
+                user.CreatedAt,
+                user.UpdatedAt,
+                user.LastLogin
+            ),
+            ApiMessages.UserRetrieved
+        );
     }
+
     public async Task<ResponseModel> GetUserByEmail(string email)
-    {        
+    {
+        EmailValidationService.IsValidEmail(email);
+        
         var user = await _userRepo.GetUserByEmail(email);
-        return CreateSingleUserResponse(user);
+        return user is null 
+            ? ResponseService.NotFound(ApiMessages.UserNotFound) 
+            : ResponseService.Ok(
+                new UserResponse(
+                    user.Id,
+                    user.Username,
+                    user.Properties,
+                    user.CreatedAt,
+                    user.UpdatedAt,
+                    user.LastLogin
+                ),
+                ApiMessages.UserRetrieved
+            );
     }
 
     public async Task<ResponseModel> GetUserByUsername(string username, HttpContext context)
     {
         var user = await _userRepo.GetUserByUsername(username);
-        return CreateSingleUserResponse(user);
+        return user is null 
+            ? ResponseService.NotFound(ApiMessages.UserNotFound) 
+            : ResponseService.Ok(
+                new UserResponse(
+                    user.Id,
+                    user.Username,
+                    user.Properties,
+                    user.CreatedAt,
+                    user.UpdatedAt,
+                    user.LastLogin
+                ),
+                ApiMessages.UserRetrieved
+            );
     }
 
     public async Task<ResponseModel> PreRegisterUser(UserDTO userDto)
     {
-        try
+        if (!Credentials.Validate(userDto))
         {
-            if (!Credentials.Validate(userDto))
-            {
-                throw new ArgumentException(ApiMessages.EmptyCredentials);
-            }
-
-            var alreadyRegistered = await _userRepo.GetUserByEmail(userDto.Email!) != null;
-            var alreadyInPreRegister = await _userRepo.GetPreRegisteredUserByEmail(userDto.Email!) != null;
-
-            if (alreadyRegistered) {
-                return ResponseModel.Write(null!, ApiMessages.AlreadyRegistered, StatusCodes.Status422UnprocessableEntity);
-            }
-
-            if (alreadyInPreRegister) {
-                return ResponseModel.Write(null!, ApiMessages.InRegisterProgress, StatusCodes.Status422UnprocessableEntity);
-            }
-            
-            var preRegister = new PreRegistrationUser()
-            {
-                Email = userDto.Email!,
-                Username = userDto.Username!,
-                Password = Encryption.Encrypt(userDto.Password!),
-                EmailValidationToken = Guid.NewGuid(),
-            };
-
-            await _userRepo.PreRegisterUser(preRegister);
-
-            _emailSenderService.SendEmailVerification(preRegister);
-
-            return ResponseModel.Write(preRegister, ApiMessages.UserCreated, StatusCodes.Status200OK);
-
-        }
-        catch (Exception ex) 
-        {
-            throw new Exception(ex.Message);
+            throw new ArgumentException(ApiMessages.EmptyCredentials);
         }
 
+        var alreadyRegistered = await _userRepo.GetUserByEmail(userDto.Email!) != null;
+        var alreadyInPreRegister = await _userRepo.GetPreRegisteredUserByEmail(userDto.Email!) != null;
+
+        if (alreadyRegistered || alreadyInPreRegister)
+        {
+            return ResponseService.UnprocessableEntity(
+                alreadyRegistered 
+                    ? ApiMessages.AlreadyRegistered 
+                    : ApiMessages.InRegisterProgress
+            );
+        }
+        
+        var preRegister = new PreRegistrationUser
+        {
+            Email = userDto.Email!,
+            Username = userDto.Username!,
+            Password = Encryption.Encrypt(userDto.Password!),
+            EmailValidationToken = Guid.NewGuid(),
+        };
+
+        await _userRepo.PreRegisterUser(preRegister);
+
+        _emailSenderService.SendEmailVerification(preRegister);
+
+        return ResponseService.Ok(preRegister, ApiMessages.UserCreated);
     }
-
+    
     public async Task<ResponseModel> FinishRegisterUser(UserConfirmationDTO dto)
     {
-        try
-        {
-            var user = await _userRepo.FinishRegisterUser(dto.Token, dto.Password);
+        var user = await _userRepo.FinishRegisterUser(dto.Token, dto.Password);
 
-            if (user is null)
-            {
-                return ResponseModel.Write(user!, ApiMessages.NotInPreRegister, StatusCodes.Status404NotFound);
-            }
-
-            return ResponseModel.Write(user!, ApiMessages.UserCreated, StatusCodes.Status201Created);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
-        }
+        return user is null 
+            ? ResponseService.NotFound(ApiMessages.NotInPreRegister)
+            : ResponseService.Created(user, ApiMessages.UserCreated);
     }
     
     public async Task<ResponseModel> LoginUser(UserDTO userDto)
     {
-        try
+        ValidateCredentials(userDto);
+        var user = await _userRepo.GetUserByUsername(userDto.Username!);
+        if (user is null)
         {
-            Credentials.Validate(userDto);
-
-            User? user = null;
-
-            if (userDto.Username != null)
-            {
-                user = await _userRepo.GetUserByUsername(userDto.Username!);
-            }
-            else
-            {
-                user = await _userRepo.GetUserByEmail(userDto.Email!);
-            }
-
-            if (user is null)
-            {
-                return ResponseModel.Write(null!, ApiMessages.UserNotFound, StatusCodes.Status404NotFound);
-            }
-            
-            if(!Encryption.Verify(userDto.Password!, user.Password))
-            {
-                return ResponseModel.Write(null!, ApiMessages.WrongPassword, StatusCodes.Status400BadRequest);
-            }
-
-            var token = JwtAuth.GenerateJwtToken(user);
-            return ResponseModel.Write(token, ApiMessages.LoginSuccess, StatusCodes.Status200OK);
+            return ResponseService.NotFound(ApiMessages.UserNotFound);
         }
-        catch (Exception ex)
+        
+        if(!PasswordService.Verify(userDto.Password!, user.Password))
         {
-            throw new Exception(ex.Message);
+            return ResponseService.BadRequest(ApiMessages.WrongPassword);
         }
+
+        var token = JwtService.GenerateJwtToken(user);
+        return ResponseService.Ok(token, ApiMessages.LoginSuccess);
     }
 
-    public async Task<ResponseModel> UpdateProperties(UserPropertiesDTO properties, HttpContext context, Guid? id = null)
+    public async Task<ResponseModel> UpdateProperties(UserPropertiesDTO properties, HttpContext context)
     {
-        try
+        var userId = JwtService.GetAuthenticatedUserId(context);
+        var user = await _userRepo.GetUserById(userId);
+
+        if (user is null)
         {
-            Guid userId; 
-            if (id is not null)
-            {
-                JwtAuth.IsAdmin(context);
-                userId = (Guid) id;
-            }
-            else
-            {
-                JwtAuth.RequireAuthentication(context);
-                userId = JwtAuth.GetAuthenticatedUserId(context);
-            }
-
-            var user = await _userRepo.GetUserById(userId);
-            
-            if (user is null)
-            {
-                return ResponseModel.Write(null!, ApiMessages.UserNotFound, StatusCodes.Status404NotFound);
-            }
-
-            var newUserProperties = new UserProperties
+            return ResponseService.NotFound(ApiMessages.UserNotFound);
+        }
+        
+        await _userRepo.UpdateUserProperties(
+            new UserProperties
             {
                 User = user,
                 LastActivity = DateTime.Now,
-                Bio = properties.Bio ?? user.Properties.Bio,
-                Photo = properties.Photo ?? user.Properties.Photo,
-            };
+                Bio = properties.Bio,
+                Photo = properties.Photo,
+            }    
+        );
 
-            await _userRepo.UpdateUserProperties(newUserProperties);
-
-            return ResponseModel.Write(user, ApiMessages.UserUpdated, StatusCodes.Status200OK);
-        }
-        catch (Exception e)
+        return ResponseService.Ok(
+            new UserResponse(user.Id, user.Username), ApiMessages.UserUpdated
+        );
+    }
+    
+    
+    
+    private static ResponseModel CreateMyselfResponse(User? user)
+    {
+        if (user is null)
         {
-            throw new Exception(e.Message);
+            return ResponseService.NotFound(ApiMessages.UserNotFound);
         }
+
+        var myself = new Myself
+        (
+            user.Id,
+            user.Username,
+            user.Email,
+            user.Properties is not null
+                ? new UserProperties
+                {
+                    Bio = user.Properties.Bio,
+                    Photo = user.Properties.Photo,
+                    LastActivity = user.Properties.LastActivity,
+                    Status = user.Properties.Status,
+                    UserRole = user.Properties.UserRole
+                }
+                : null,
+            user.CreatedAt,
+            user.UpdatedAt,
+            user.LastLogin
+        );
+
+        return ResponseService.Ok(
+            myself,
+            message: ApiMessages.UserRetrieved
+        );
+    }
+    
+    private static void ValidateEmptyCredentials(UserDTO user)
+    {
+        if (user.Username is null || user.Password is null)
+        {
+            throw new ArgumentException(ApiMessages.EmptyCredentials);
+        }
+    }
+
+    private static void ValidateCredentials(UserDTO userDto)
+    {
+        ValidateEmptyCredentials(userDto);
+        EmailValidationService.IsValidEmail(userDto.Email);
+        PasswordService.Validate(userDto.Password);
     }
 }

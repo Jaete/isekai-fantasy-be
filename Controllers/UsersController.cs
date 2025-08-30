@@ -2,8 +2,8 @@
 using IsekaiFantasyBE.Models.Users;
 using IsekaiFantasyBE.Models.Response;
 using IsekaiFantasyBE.Services;
-using Microsoft.AspNetCore.Mvc;
 using IsekaiFantasyBE.Services.Utils;
+using Microsoft.AspNetCore.Mvc;
 
 namespace IsekaiFantasyBE.Controllers;
 
@@ -29,7 +29,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var response = await _userService.GetMyself(JwtAuth.GetAuthenticatedUserId(HttpContext));
+            var response = await _userService.GetMyself(JwtService.GetAuthenticatedUserId(HttpContext));
             return response.StatusCode switch
             {
                 StatusCodes.Status401Unauthorized => Unauthorized(response),
@@ -41,10 +41,11 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
+            var statusCode = ExceptionService.GetStatusCode(e);
             return StatusCode(
-                Exceptions.GetStatusCode(e),
-                ResponseModel.Write(e.InnerException!, e.Message, Exceptions.GetStatusCode(e), e.StackTrace
-            ));
+                statusCode,
+                ResponseService.InternalError(e.InnerException.Message, statusCode, e.StackTrace)
+            );
         }
     }
 
@@ -59,7 +60,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            JwtAuth.RequireAuthentication(HttpContext);
+            JwtService.RequireAuthentication(HttpContext);
             var guid = Guid.Parse(id);
             var users = await _userService.GetUserById(guid);
 
@@ -73,10 +74,11 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
+            var statusCode = ExceptionService.GetStatusCode(e);
             return StatusCode(
-                Exceptions.GetStatusCode(e),
-                ResponseModel.Write(e.InnerException!, e.Message, Exceptions.GetStatusCode(e), e.StackTrace
-            ));
+                statusCode,
+                ResponseService.InternalError(e.InnerException?.Message!, statusCode, e.InnerException?.StackTrace!)
+            );
         }
         
     }
@@ -92,7 +94,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            JwtAuth.RequireAuthentication(HttpContext);
+            JwtService.RequireAuthentication(HttpContext);
             var user = await _userService.GetUserByEmail(email);
 
             return user.StatusCode switch
@@ -106,10 +108,11 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
+            var statusCode = ExceptionService.GetStatusCode(e);
             return StatusCode(
-                Exceptions.GetStatusCode(e),
-                ResponseModel.Write(e.InnerException!, e.Message, Exceptions.GetStatusCode(e), e.StackTrace
-            ));
+                statusCode,
+                ResponseService.InternalError(e.InnerException?.Message!, statusCode, e.InnerException?.StackTrace!)
+            );
         }
     }
 
@@ -123,7 +126,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            JwtAuth.RequireAuthentication(HttpContext);
+            JwtService.RequireAuthentication(HttpContext);
             var user = await _userService.GetUserByUsername(username, HttpContext);
             return user.StatusCode switch
             {
@@ -136,10 +139,11 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
+            var statusCode = ExceptionService.GetStatusCode(e);
             return StatusCode(
-                Exceptions.GetStatusCode(e),
-                ResponseModel.Write(e.InnerException!, e.Message, Exceptions.GetStatusCode(e), e.StackTrace
-            ));
+                statusCode,
+                ResponseService.InternalError(e.InnerException?.Message!, statusCode, e.InnerException?.StackTrace!)
+            );
         }
     }
     
@@ -166,10 +170,11 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
+            var statusCode = ExceptionService.GetStatusCode(e);
             return StatusCode(
-                Exceptions.GetStatusCode(e),
-                ResponseModel.Write(e.InnerException!, e.Message, Exceptions.GetStatusCode(e), e.StackTrace
-            ));
+                statusCode,
+                ResponseService.InternalError(e.Message, statusCode, e.StackTrace)
+            );
         }
     }
 
@@ -194,13 +199,14 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
+            var statusCode = ExceptionService.GetStatusCode(e);
             return StatusCode(
-                Exceptions.GetStatusCode(e),
-                ResponseModel.Write(e.InnerException!, e.Message, Exceptions.GetStatusCode(e), e.StackTrace
-            ));
+                statusCode,
+                ResponseService.InternalError(e.InnerException?.Message!, statusCode, e.InnerException?.StackTrace!)
+            );
         }
     }
-
+    
     [HttpPost]
     [Route("login")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -223,40 +229,11 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
+            var statusCode = ExceptionService.GetStatusCode(e);
             return StatusCode(
-                Exceptions.GetStatusCode(e),
-                ResponseModel.Write(e.InnerException!, e.Message, Exceptions.GetStatusCode(e), e.StackTrace
-            ));
-        }
-    }
-
-    [HttpPut]
-    [Route("update/{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<ResponseModel>> UpdateProperties(Guid id, [FromBody] UserPropertiesDTO userProperties)
-    {
-        try
-        {
-            var response = await _userService.UpdateProperties(userProperties, HttpContext, id);
-            return response.StatusCode switch
-            {
-                StatusCodes.Status401Unauthorized => Unauthorized(response),
-                StatusCodes.Status400BadRequest => BadRequest(response),
-                StatusCodes.Status404NotFound => NotFound(response),
-                StatusCodes.Status500InternalServerError => StatusCode(StatusCodes.Status500InternalServerError, response),
-                _ => Ok(response)
-            };
-        }
-        catch (Exception e)
-        {
-            return StatusCode(
-                Exceptions.GetStatusCode(e),
-                ResponseModel.Write(e.InnerException!, e.Message, Exceptions.GetStatusCode(e), e.StackTrace
-            ));
+                statusCode,
+                ResponseService.InternalError(e.InnerException?.Message!, statusCode, e.InnerException?.StackTrace!)
+            );
         }
     }
 
@@ -267,7 +244,7 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<ResponseModel>> UpdateSelf([FromBody] UserPropertiesDTO userProperties)
+    public async Task<ActionResult<ResponseModel>> UpdateProperties([FromBody] UserPropertiesDTO userProperties)
     {
         try
         {
@@ -283,10 +260,11 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
+            var statusCode = ExceptionService.GetStatusCode(e);
             return StatusCode(
-                Exceptions.GetStatusCode(e),
-                ResponseModel.Write(e.InnerException!, e.Message, Exceptions.GetStatusCode(e), e.StackTrace
-            ));
+                statusCode,
+                ResponseService.InternalError(e.InnerException?.Message!, statusCode, e.InnerException?.StackTrace!)
+            );
         }
     }
 }

@@ -10,15 +10,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace IsekaiFantasyBE.Migrations
 {
-    [DbContext(typeof(UserDbContext))]
-    [Migration("20241222004043_001-create-user")]
-    partial class _001createuser
+    [DbContext(typeof(AppDBContext))]
+    [Migration("20250822225600_001-regular-user-and-admin")]
+    partial class _001regularuserandadmin
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.33")
+                .HasAnnotation("ProductVersion", "6.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("IsekaiFantasyBE.Models.Users.User", b =>
@@ -27,22 +27,28 @@ namespace IsekaiFantasyBE.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime");
+                    b.Property<DateTime?>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime>("LastLogin")
-                        .HasColumnType("datetime");
+                    b.Property<DateTime?>("LastLogin")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<byte[]>("Password")
                         .IsRequired()
                         .HasColumnType("longblob");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -60,26 +66,31 @@ namespace IsekaiFantasyBE.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Bio")
-                        .IsRequired()
-                        .HasColumnType("Text");
+                        .HasColumnType("text");
 
-                    b.Property<DateTime>("LastActivity")
-                        .HasColumnType("datetime");
+                    b.Property<DateTime?>("LastActivity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Photo")
-                        .IsRequired()
                         .HasColumnType("VARCHAR(255)");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("VARCHAR(32)");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("char(36)");
 
+                    b.Property<int?>("UserRole")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("UsersProperties");
                 });
@@ -87,8 +98,8 @@ namespace IsekaiFantasyBE.Migrations
             modelBuilder.Entity("IsekaiFantasyBE.Models.Users.UserProperties", b =>
                 {
                     b.HasOne("IsekaiFantasyBE.Models.Users.User", "User")
-                        .WithMany("Properties")
-                        .HasForeignKey("UserId")
+                        .WithOne("Properties")
+                        .HasForeignKey("IsekaiFantasyBE.Models.Users.UserProperties", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

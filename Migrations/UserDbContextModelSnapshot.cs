@@ -9,50 +9,43 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace IsekaiFantasyBE.Migrations
 {
-    [DbContext(typeof(UserDbContext))]
+    [DbContext(typeof(AppDBContext))]
     partial class UserDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.7")
+                .HasAnnotation("ProductVersion", "6.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("IsekaiFantasyBE.Models.Users.PreRegistrationUser", b =>
+            modelBuilder.Entity("IsekaiFantasyBE.Models.Users.BannedUsers", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<DateTime>("BannedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
+                    b.Property<Guid>("BannedById")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("BannedUntil")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
                         .HasColumnType("longtext");
 
-                    b.Property<Guid>("EmailValidationToken")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("char(36)");
 
-                    b.Property<byte[]>("Password")
-                        .IsRequired()
-                        .HasColumnType("longblob");
+                    b.HasIndex("BannedById");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                    b.HasIndex("UserId");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("VARCHAR(32)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PreRegistrationUsers");
+                    b.ToTable("BannedUsers");
                 });
 
             modelBuilder.Entity("IsekaiFantasyBE.Models.Users.User", b =>
@@ -127,6 +120,25 @@ namespace IsekaiFantasyBE.Migrations
                         .IsUnique();
 
                     b.ToTable("UsersProperties");
+                });
+
+            modelBuilder.Entity("IsekaiFantasyBE.Models.Users.BannedUsers", b =>
+                {
+                    b.HasOne("IsekaiFantasyBE.Models.Users.User", "BannedBy")
+                        .WithMany()
+                        .HasForeignKey("BannedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IsekaiFantasyBE.Models.Users.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BannedBy");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("IsekaiFantasyBE.Models.Users.UserProperties", b =>

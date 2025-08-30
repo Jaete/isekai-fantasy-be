@@ -1,5 +1,4 @@
 using System.Net;
-using System.Net.Http;
 using System.Net.Mail;
 using System.Text;
 using IsekaiFantasyBE.Models.Users;
@@ -25,7 +24,7 @@ namespace IsekaiFantasyBE.Services.Utils
                 .Replace("{{Name}}", user.Username)
                 .Replace("{{VerificationLink}}", $"{_config["BaseUrls:AppBaseUrl"]}/verify?token={user.EmailValidationToken}");
 
-            MailMessage email = GetEmail("ValidaÁ„o de Usu·rio - Isekai Fantasy RPG", emailBody);
+            MailMessage email = GetEmail("Valida√ß√£o de Usu√°rio - Isekai Fantasy RPG", emailBody);
             email.To.Add(user.Email);
 
             await SmtpClient().SendMailAsync(email);

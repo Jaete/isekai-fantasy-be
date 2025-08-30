@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using IsekaiFantasyBE.Contexts;
 using IsekaiFantasyBE.Repository;
@@ -11,7 +12,7 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // DBContexts
-builder.Services.AddDbContext<UserDbContext>(options =>
+builder.Services.AddDbContext<AppDBContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
@@ -32,10 +33,10 @@ builder.Services.AddCors(options =>
 // App Services
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<AdminService>();
+builder.Services.AddScoped<JwtService>();
+JwtService.Initialize(builder.Configuration);
 builder.Services.AddScoped<Mailer>();
-
-builder.Services.AddScoped<JwtAuth>();
-JwtAuth.Initialize(builder.Configuration);
 
 
 // Authentication
@@ -56,11 +57,38 @@ builder.Services.AddAuthentication(
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"])),
+        RoleClaimType = ClaimTypes.Role
     };
 
     options.RequireHttpsMetadata = false;
     options.SaveToken = true;
+    
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = context =>
+        {
+            Console.WriteLine("✅ Token validado com sucesso!");
+            return Task.CompletedTask;
+        },
+
+        OnAuthenticationFailed = context =>
+        {
+            Console.WriteLine("❌ Falha na autenticação:");
+            Console.WriteLine($"  Exception: {context.Exception.Message}");
+            if (context.Exception is SecurityTokenExpiredException)
+            {
+                Console.WriteLine("  → Token expirado");
+            }
+            return Task.CompletedTask;
+        },
+
+        OnChallenge = context =>
+        {
+            Console.WriteLine($"💡 OnChallenge: {context.Error} - {context.ErrorDescription}");
+            return Task.CompletedTask;
+        }
+    };
 });
 
 // Controllers and Swagger
@@ -100,6 +128,12 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.Services.AddDbContext<AppDBContext>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        new MySqlServerVersion("8.0.43")
+    )
+);
 
 var app = builder.Build();
 
@@ -113,6 +147,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseAuthentication();
 app.UseCors("AllowFrontend");
 
 app.UseRouting();

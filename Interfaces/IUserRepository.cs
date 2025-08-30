@@ -1,5 +1,4 @@
-﻿using IsekaiFantasyBE.Models.Response;
-using IsekaiFantasyBE.Models.Users;
+﻿using IsekaiFantasyBE.Models.Users;
 
 namespace IsekaiFantasyBE.Interfaces;
 

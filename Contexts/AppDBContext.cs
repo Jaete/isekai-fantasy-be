@@ -4,13 +4,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IsekaiFantasyBE.Contexts;
 
-public class UserDbContext : DbContext
+public class AppDBContext : DbContext
 {
-    public UserDbContext(DbContextOptions<UserDbContext> options): base(options){}
+    public AppDBContext(DbContextOptions<AppDBContext> options): base(options){}
     
     public DbSet<User> Users { get; set; }
     public DbSet<UserProperties> UsersProperties { get; set; }
     public DbSet<PreRegistrationUser> PreRegistrationUsers { get; set; }
+    
+    public DbSet<BannedUsers> BannedUsers { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -47,6 +49,11 @@ public class UserDbContext : DbContext
         modelBuilder.Entity<UserProperties>()
             .Property(up => up.UserRole)
             .HasDefaultValue(UserProperties.Role.Member)
+            .ValueGeneratedOnAdd();
+        
+        modelBuilder.Entity<BannedUsers>()
+            .Property(bu => bu.BannedAt)
+            .HasDefaultValueSql(DbProperties.CurrentTimestamp)
             .ValueGeneratedOnAdd();
     }
 }
