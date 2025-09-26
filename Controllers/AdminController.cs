@@ -87,6 +87,39 @@ public class AdminController : ControllerBase
                 ResponseService.InternalError(e.Message, statusCode, e.StackTrace!)
             );
         }
-        
+    }
+    
+    [HttpPut]
+    [Route("silence/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<ResponseModel>> Silence(string id, [FromBody]SilenceUserDTO silenceUserProps)
+    {
+        try
+        {
+            JwtService.RequireAdminAccess(HttpContext);
+            var userId = Guid.Parse(id);
+
+            var response = await _adminService.SilenceUser(userId, silenceUserProps, HttpContext);
+            return response.StatusCode switch
+            {
+                StatusCodes.Status400BadRequest => BadRequest(response),
+                StatusCodes.Status404NotFound => NotFound(response),
+                StatusCodes.Status500InternalServerError => StatusCode(StatusCodes.Status500InternalServerError, response),
+                _ => Ok(response),
+            };
+        }
+        catch (Exception e)
+        {
+            var statusCode = ExceptionService.GetStatusCode(e);
+            return StatusCode(
+                statusCode,
+                ResponseService.InternalError(e.Message, statusCode, e.StackTrace!)
+            );
+        }
     }
 }

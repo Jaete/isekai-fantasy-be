@@ -15,11 +15,11 @@ else
 fi
 
 
-if ! is_package_installed "MySql.EntityFrameworkCore"; then
-  echo "Pacote 'MySql.EntityFrameworkCore' não encontrado. Instalando..."
+if ! is_package_installed "Pomelo.EntityFrameworkCore.MySql"; then
+  echo "Pacote 'Pomelo.EntityFrameworkCore.MySql' não encontrado. Instalando..."
   dotnet add package MySql.EntityFrameworkCore
 else
-  echo "Pacote 'MySql.EntityFrameworkCore' já está instalado."
+  echo "Pacote 'Pomelo.EntityFrameworkCore.MySql' já está instalado."
 fi
 
 

@@ -1,6 +1,8 @@
 ﻿using IsekaiFantasyBE.Contexts;
 using IsekaiFantasyBE.Interfaces;
+using IsekaiFantasyBE.Models.DTO;
 using IsekaiFantasyBE.Models.Response;
+using IsekaiFantasyBE.Models.Response.Entities;
 using IsekaiFantasyBE.Models.Users;
 using IsekaiFantasyBE.Services.Utils;
 using Microsoft.EntityFrameworkCore;
@@ -52,6 +54,11 @@ public class UserRepository : IUserRepository
         }
     }
 
+    public async Task<PreRegistrationUser?> GetPreRegisteredUserByEmail(string email)
+    {
+        return await _dbContext.PreRegistrationUsers.FirstOrDefaultAsync(up => up.Email == email);
+    }
+    
     public async Task<User?> FinishRegisterUser(Guid token, string password)
     {
         try
@@ -81,7 +88,7 @@ public class UserRepository : IUserRepository
             var properties = new UserProperties
             {
                 User = user,
-                Status = UserProperties.ACTIVE,
+                Status = UserStatus.Active,
             };
             user.Properties = properties;
             
@@ -124,15 +131,31 @@ public class UserRepository : IUserRepository
             BannedAt = DateTime.Now,
             Reason = reason
         };
-        
+
+        user.Properties!.Status = UserStatus.Banned;
+        _dbContext.UsersProperties.Update(user.Properties!);
         _dbContext.BannedUsers.Add(bannedUser);
         
         await _dbContext.SaveChangesAsync();
         return bannedUser;
     }
 
-    public async Task<PreRegistrationUser?> GetPreRegisteredUserByEmail(string email)
+
+    public async Task<SilencedUsers> SilenceUser(User user, User admin, SilenceUserDTO silenceUserProps)
     {
-        return await _dbContext.PreRegistrationUsers.FirstOrDefaultAsync(up => up.Email == email);
+        user.Properties!.Status = UserStatus.Silenced;
+        var silencedUser = new SilencedUsers()
+        {
+            User = user,
+            SilencedBy = admin,
+            SilencedAt = DateTime.Now,
+            SilencedUntil = silenceUserProps.SilencedUntil,
+            Reason = silenceUserProps.Reason
+        };
+
+        _dbContext.SilencedUsers.Add(silencedUser);
+        _dbContext.UsersProperties.Update(user.Properties!);
+        await _dbContext.SaveChangesAsync();
+        return silencedUser;
     }
 }

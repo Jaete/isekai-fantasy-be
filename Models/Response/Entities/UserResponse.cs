@@ -9,4 +9,14 @@ public record UserResponse(
     DateTime? Created = null,
     DateTime? Updated = null,
     DateTime? LastLogin = null
-);
+){
+    public UserResponse(User user) : this(
+        user.Id,
+        user.Username,
+        user.Properties,
+        user.CreatedAt,
+        user.UpdatedAt,
+        user.LastLogin)
+    {}
+}
+

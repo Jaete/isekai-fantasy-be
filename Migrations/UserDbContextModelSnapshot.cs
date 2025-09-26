@@ -16,24 +16,25 @@ namespace IsekaiFantasyBE.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.0")
+                .HasAnnotation("ProductVersion", "6.0.33")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("IsekaiFantasyBE.Models.Users.BannedUsers", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("BannedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<Guid>("BannedById")
                         .HasColumnType("char(36)");
 
                     b.Property<DateTime>("BannedUntil")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Reason")
                         .HasColumnType("longtext");
@@ -41,11 +42,81 @@ namespace IsekaiFantasyBE.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("char(36)");
 
+                    b.HasKey("Id");
+
                     b.HasIndex("BannedById");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("BannedUsers");
+                });
+
+            modelBuilder.Entity("IsekaiFantasyBE.Models.Users.PreRegistrationUser", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("EmailValidationToken")
+                        .HasColumnType("char(36)");
+
+                    b.Property<byte[]>("Password")
+                        .IsRequired()
+                        .HasColumnType("longblob");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("VARCHAR(32)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PreRegistrationUsers");
+                });
+
+            modelBuilder.Entity("IsekaiFantasyBE.Models.Users.SilencedUsers", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("SilencedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<Guid>("SilencedById")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("SilencedUntil")
+                        .HasColumnType("datetime");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SilencedById");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SilencedUsers");
                 });
 
             modelBuilder.Entity("IsekaiFantasyBE.Models.Users.User", b =>
@@ -137,6 +208,25 @@ namespace IsekaiFantasyBE.Migrations
                         .IsRequired();
 
                     b.Navigation("BannedBy");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("IsekaiFantasyBE.Models.Users.SilencedUsers", b =>
+                {
+                    b.HasOne("IsekaiFantasyBE.Models.Users.User", "SilencedBy")
+                        .WithMany()
+                        .HasForeignKey("SilencedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IsekaiFantasyBE.Models.Users.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SilencedBy");
 
                     b.Navigation("User");
                 });

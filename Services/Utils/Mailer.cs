@@ -30,7 +30,7 @@ namespace IsekaiFantasyBE.Services.Utils
             await SmtpClient().SendMailAsync(email);
         }
 
-        public MailMessage GetEmail(string subject, string body)
+        private MailMessage GetEmail(string subject, string body)
         {
             return new MailMessage
             {
@@ -43,7 +43,7 @@ namespace IsekaiFantasyBE.Services.Utils
             };
         }
 
-        public string GetEmailTemplate(string path)
+        private string GetEmailTemplate(string path)
         {
             var emailTemplate = Path.Combine(
                 _environment.ContentRootPath,
@@ -54,7 +54,7 @@ namespace IsekaiFantasyBE.Services.Utils
             return File.ReadAllText(emailTemplate);
         }
 
-        public SmtpClient SmtpClient()
+        private SmtpClient SmtpClient()
         {
             return new SmtpClient()
             {

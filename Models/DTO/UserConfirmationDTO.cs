@@ -1,7 +1,7 @@
 namespace IsekaiFantasyBE.Models.DTO;
 
-public class UserConfirmationDTO
-{
-    public Guid Token { get; set; }
-    public string Password { get; set; }
-}
+public record UserConfirmationDTO
+(
+    Guid Token,
+    string Password
+);

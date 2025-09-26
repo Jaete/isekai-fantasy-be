@@ -21,11 +21,11 @@ if (-not (Is-PackageInstalled -packageName "Microsoft.EntityFrameworkCore")) {
     Write-Host "Pacote 'Microsoft.EntityFrameworkCore' já está instalado."
 }
 
-if (-not (Is-PackageInstalled -packageName "MySql.EntityFrameworkCore")) {
-    Write-Host "Pacote 'MySql.EntityFrameworkCore' não encontrado. Instalando..."
-    dotnet add package MySql.EntityFrameworkCore --version 6.0.0
+if (-not (Is-PackageInstalled -packageName "Pomelo.EntityFrameworkCore.MySql")) {
+    Write-Host "Pacote 'Pomelo.EntityFrameworkCore.MySql' não encontrado. Instalando..."
+    dotnet add package Pomelo.EntityFrameworkCore.MySql --version 6.0.0
 } else {
-    Write-Host "Pacote 'MySql.EntityFrameworkCore' já está instalado."
+    Write-Host "Pacote 'Pomelo.EntityFrameworkCore.MySql' já está instalado."
 }
 
 if (-not (Is-PackageInstalled -packageName "Microsoft.AspNetCore.Authentication.JwtBearer")) {

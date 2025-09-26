@@ -24,7 +24,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.WithOrigins("http://localhost:8080")
              .AllowAnyMethod()
              .AllowAnyHeader();
     });
@@ -35,8 +35,8 @@ builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AdminService>();
 builder.Services.AddScoped<JwtService>();
-JwtService.Initialize(builder.Configuration);
 builder.Services.AddScoped<Mailer>();
+JwtService.Initialize(builder.Configuration);
 
 
 // Authentication
@@ -157,3 +157,9 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
+namespace IsekaiFantasyBE
+{
+    public partial class Program { }
+}

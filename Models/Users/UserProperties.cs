@@ -6,8 +6,6 @@ namespace IsekaiFantasyBE.Models.Users;
 
 public class UserProperties
 {
-    public const string BANNED = "banned";
-    public const string ACTIVE = "active";
     public enum Role { Admin = 0, Member, Moderation, Narrator, }
     
     [JsonIgnore]

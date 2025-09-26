@@ -44,7 +44,7 @@ public class UsersController : ControllerBase
             var statusCode = ExceptionService.GetStatusCode(e);
             return StatusCode(
                 statusCode,
-                ResponseService.InternalError(e.InnerException.Message, statusCode, e.StackTrace)
+                ResponseService.InternalError(e.Message, statusCode, e.StackTrace!)
             );
         }
     }
@@ -173,7 +173,7 @@ public class UsersController : ControllerBase
             var statusCode = ExceptionService.GetStatusCode(e);
             return StatusCode(
                 statusCode,
-                ResponseService.InternalError(e.Message, statusCode, e.StackTrace)
+                ResponseService.InternalError(e.Message, statusCode, e.StackTrace!)
             );
         }
     }
@@ -211,6 +211,7 @@ public class UsersController : ControllerBase
     [Route("login")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<ResponseModel>> Login([FromBody] UserDTO userDto)
@@ -232,7 +233,7 @@ public class UsersController : ControllerBase
             var statusCode = ExceptionService.GetStatusCode(e);
             return StatusCode(
                 statusCode,
-                ResponseService.InternalError(e.InnerException?.Message!, statusCode, e.InnerException?.StackTrace!)
+                ResponseService.InternalError(e.Message, statusCode, e.StackTrace!)
             );
         }
     }
@@ -248,6 +249,7 @@ public class UsersController : ControllerBase
     {
         try
         {
+            Console.WriteLine("UPDATING");
             var response = await _userService.UpdateProperties(userProperties, HttpContext);
             return response.StatusCode switch
             {

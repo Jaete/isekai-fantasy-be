@@ -74,4 +74,33 @@ public class AdminService
             ApiMessages.UserBanned
         );
     }
+
+    public async Task<ResponseModel> SilenceUser(Guid userId, SilenceUserDTO silenceUserProps, HttpContext httpContext)
+    {
+        var admin = await _userRepository.GetUserById(JwtService.GetAuthenticatedUserId(httpContext));
+        var user = await _userRepository.GetUserById(userId);
+        
+        if (user is null)
+        {
+            return ResponseService.NotFound(ApiMessages.UserNotFound);
+        }
+
+        var silencedUser = await _userRepository.SilenceUser(user, admin!, silenceUserProps);
+        return ResponseService.Ok(
+            new SilencedResponse(
+                SilencedUser: new UserResponse(
+                    silencedUser.User.Id,
+                    silencedUser.User.Username
+                ),
+                SilencedBy: new UserResponse(
+                    admin!.Id,
+                    admin.Username
+                ),
+                silencedUser.SilencedAt,
+                silencedUser.SilencedUntil,
+                silencedUser.Reason!
+            ),
+            ApiMessages.UserSilenced
+        );
+    }
 }

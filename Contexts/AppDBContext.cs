@@ -12,6 +12,7 @@ public class AppDBContext : DbContext
     public DbSet<UserProperties> UsersProperties { get; set; }
     public DbSet<PreRegistrationUser> PreRegistrationUsers { get; set; }
     
+    public DbSet<SilencedUsers> SilencedUsers { get; set; }
     public DbSet<BannedUsers> BannedUsers { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -53,6 +54,11 @@ public class AppDBContext : DbContext
         
         modelBuilder.Entity<BannedUsers>()
             .Property(bu => bu.BannedAt)
+            .HasDefaultValueSql(DbProperties.CurrentTimestamp)
+            .ValueGeneratedOnAdd();
+        
+        modelBuilder.Entity<SilencedUsers>()
+            .Property(su => su.SilencedAt)
             .HasDefaultValueSql(DbProperties.CurrentTimestamp)
             .ValueGeneratedOnAdd();
     }

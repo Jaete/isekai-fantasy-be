@@ -4,13 +4,16 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
-        <RootNamespace>UnitTests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
+        <!-- Pacotes obrigatórios -->
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+        <PackageReference Include="xunit" Version="2.9.3" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.30" />
         <PackageReference Include="coverlet.collector" Version="3.1.2">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
@@ -18,6 +21,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\IsekaiFantasyBE.csproj" />
+        <!-- Referência ao projeto principal -->
+        <ProjectReference Include="..\IsekaiFantasyBE.csproj" />
     </ItemGroup>
+
 </Project>

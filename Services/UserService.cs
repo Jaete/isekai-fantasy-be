@@ -37,17 +37,7 @@ public class UserService
         
         return user is null 
             ? ResponseService.NotFound(ApiMessages.UserNotFound)
-            : ResponseService.Ok(
-            new UserResponse(
-                user.Id,
-                user.Username,
-                user.Properties,
-                user.CreatedAt,
-                user.UpdatedAt,
-                user.LastLogin
-            ),
-            ApiMessages.UserRetrieved
-        );
+            : ResponseService.Ok(new UserResponse(user), ApiMessages.UserRetrieved);
     }
 
     public async Task<ResponseModel> GetUserByEmail(string email)
@@ -57,17 +47,7 @@ public class UserService
         var user = await _userRepo.GetUserByEmail(email);
         return user is null 
             ? ResponseService.NotFound(ApiMessages.UserNotFound) 
-            : ResponseService.Ok(
-                new UserResponse(
-                    user.Id,
-                    user.Username,
-                    user.Properties,
-                    user.CreatedAt,
-                    user.UpdatedAt,
-                    user.LastLogin
-                ),
-                ApiMessages.UserRetrieved
-            );
+            : ResponseService.Ok(new UserResponse(user), ApiMessages.UserRetrieved);
     }
 
     public async Task<ResponseModel> GetUserByUsername(string username, HttpContext context)
@@ -75,25 +55,12 @@ public class UserService
         var user = await _userRepo.GetUserByUsername(username);
         return user is null 
             ? ResponseService.NotFound(ApiMessages.UserNotFound) 
-            : ResponseService.Ok(
-                new UserResponse(
-                    user.Id,
-                    user.Username,
-                    user.Properties,
-                    user.CreatedAt,
-                    user.UpdatedAt,
-                    user.LastLogin
-                ),
-                ApiMessages.UserRetrieved
-            );
+            : ResponseService.Ok(new UserResponse(user), ApiMessages.UserRetrieved);
     }
 
     public async Task<ResponseModel> PreRegisterUser(UserDTO userDto)
     {
-        if (!Credentials.Validate(userDto))
-        {
-            throw new ArgumentException(ApiMessages.EmptyCredentials);
-        }
+        Credentials.Validate(userDto);
 
         var alreadyRegistered = await _userRepo.GetUserByEmail(userDto.Email!) != null;
         var alreadyInPreRegister = await _userRepo.GetPreRegisteredUserByEmail(userDto.Email!) != null;
@@ -112,7 +79,7 @@ public class UserService
             Email = userDto.Email!,
             Username = userDto.Username!,
             Password = Encryption.Encrypt(userDto.Password!),
-            EmailValidationToken = Guid.NewGuid(),
+            EmailValidationToken = Credentials.GenerateEmailValidationToken(),
         };
 
         await _userRepo.PreRegisterUser(preRegister);
@@ -128,13 +95,16 @@ public class UserService
 
         return user is null 
             ? ResponseService.NotFound(ApiMessages.NotInPreRegister)
-            : ResponseService.Created(user, ApiMessages.UserCreated);
+            : ResponseService.Created(new UserResponse(user), ApiMessages.UserCreated);
     }
     
     public async Task<ResponseModel> LoginUser(UserDTO userDto)
     {
-        ValidateCredentials(userDto);
-        var user = await _userRepo.GetUserByUsername(userDto.Username!);
+        Credentials.Validate(userDto);
+        var user = userDto.Username != null 
+            ? await _userRepo.GetUserByUsername(userDto.Username!)
+            : await _userRepo.GetUserByEmail(userDto.Email!);
+        
         if (user is null)
         {
             return ResponseService.NotFound(ApiMessages.UserNotFound);
@@ -145,6 +115,11 @@ public class UserService
             return ResponseService.BadRequest(ApiMessages.WrongPassword);
         }
 
+        if (user.Properties!.Status == UserStatus.Banned)
+        {
+            throw new UnauthorizedAccessException(ApiMessages.UserBanned);
+        }
+
         var token = JwtService.GenerateJwtToken(user);
         return ResponseService.Ok(token, ApiMessages.LoginSuccess);
     }
@@ -152,6 +127,7 @@ public class UserService
     public async Task<ResponseModel> UpdateProperties(UserPropertiesDTO properties, HttpContext context)
     {
         var userId = JwtService.GetAuthenticatedUserId(context);
+        Console.WriteLine(userId);
         var user = await _userRepo.GetUserById(userId);
 
         if (user is null)
@@ -174,53 +150,16 @@ public class UserService
         );
     }
     
-    
-    
     private static ResponseModel CreateMyselfResponse(User? user)
     {
         if (user is null)
         {
             return ResponseService.NotFound(ApiMessages.UserNotFound);
         }
-
-        var myself = new Myself
-        (
-            user.Id,
-            user.Username,
-            user.Email,
-            user.Properties is not null
-                ? new UserProperties
-                {
-                    Bio = user.Properties.Bio,
-                    Photo = user.Properties.Photo,
-                    LastActivity = user.Properties.LastActivity,
-                    Status = user.Properties.Status,
-                    UserRole = user.Properties.UserRole
-                }
-                : null,
-            user.CreatedAt,
-            user.UpdatedAt,
-            user.LastLogin
-        );
-
+        
         return ResponseService.Ok(
-            myself,
+            new Myself(user),
             message: ApiMessages.UserRetrieved
         );
-    }
-    
-    private static void ValidateEmptyCredentials(UserDTO user)
-    {
-        if (user.Username is null || user.Password is null)
-        {
-            throw new ArgumentException(ApiMessages.EmptyCredentials);
-        }
-    }
-
-    private static void ValidateCredentials(UserDTO userDto)
-    {
-        ValidateEmptyCredentials(userDto);
-        EmailValidationService.IsValidEmail(userDto.Email);
-        PasswordService.Validate(userDto.Password);
     }
 }

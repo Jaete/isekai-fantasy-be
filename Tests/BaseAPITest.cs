@@ -1,19 +1,20 @@
 ﻿using System.Text;
 using System.Text.Json;
 using IsekaiFantasyBE.Models.Response;
+using Xunit;
+using Microsoft.AspNetCore.Mvc.Testing;
 
-namespace UserAPI.Tests;
+namespace IsekaiFantasyBE.Tests;
 
-public class BaseAPITest
+public class BaseApiTest : IClassFixture<WebApplicationFactory<Program>>
 {
+    protected readonly HttpClient Client;
 
-    protected HttpClient Client;
-    
-    public BaseAPITest()
+    public BaseApiTest(WebApplicationFactory<Program> factory)
     {
-        Client = SetupClient();
+        Client = factory.CreateClient();
     }
-    private static string GetUri()
+    /*private static string GetUri()
     {
         var configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
@@ -32,7 +33,7 @@ public class BaseAPITest
         client.BaseAddress = new Uri(GetUri());
         
         return client;
-    }
+    }*/
 
     protected static async Task<ResponseModel?> ResponseSerialize(HttpResponseMessage response)
     {

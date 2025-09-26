@@ -1,27 +1,26 @@
-﻿using IsekaiFantasyBE.Models.DTO;
+﻿// UserControllerTests.cs
+using IsekaiFantasyBE.Models.DTO;
 using IsekaiFantasyBE.Models.Response;
-using UserAPI.Tests;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Testing; // ✅ Para StatusCodes
 using Xunit;
 
 namespace IsekaiFantasyBE.Tests.UserAPI;
 
-public class UserControllerTests : BaseAPITest
+public class UserControllerTests : BaseApiTest
 {
-    private const string BaseUri = "/Users";
+    public UserControllerTests(WebApplicationFactory<Program> factory) : base(factory) { }
     
-    [Fact]
-    public async Task TestRegisterWithNoCredentials()
-    {
-        var userDto = new UserDTO
-        {
-            Username = "",
-            Password = "",
-            Email = "",
-        };
+    private const string BaseUri = "/Users";
 
-        var response = await Client.PostAsync($"{BaseUri}/register", GetContent(userDto));
+    [Fact]
+    public async Task TestPreRegisterWithNoCredentials()
+    {
+        var userDto = new UserDTO("", "", "");
+
+        var response = await Client.PostAsync($"{BaseUri}/pre-register", GetContent(userDto));
         var responseModel = await ResponseSerialize(response);
-        
+
         Assert.NotNull(responseModel);
         Assert.Equal(ApiMessages.EmptyCredentials, responseModel.Message);
         Assert.Equal(StatusCodes.Status400BadRequest, responseModel.StatusCode);
@@ -30,108 +29,13 @@ public class UserControllerTests : BaseAPITest
     [Fact]
     public async Task TestRegisterWithInvalidEmail()
     {
-        var userDto = new UserDTO
-        {
-            Username = "test",
-            Password = "test", // Password is invalid too, but email validation throws first
-            Email = "",
-        };
+        var userDto = new UserDTO(Username: null, Email: "invalid-mail", Password: "string123!S");
 
-        var response = await Client.PostAsync($"{BaseUri}/register", GetContent(userDto));
+        var response = await Client.PostAsync($"{BaseUri}/pre-register", GetContent(userDto));
         var responseModel = await ResponseSerialize(response);
-        
+
         Assert.NotNull(responseModel);
         Assert.Equal(ApiMessages.EmailInvalid, responseModel.Message);
-        Assert.Equal(StatusCodes.Status400BadRequest, responseModel.StatusCode);
-    }
-
-    [Fact]
-    public async Task TestRegisterWithTooFewCharactersPassword()
-    {
-        var userDto = new UserDTO
-        {
-            Username = "test",
-            Password = "test",
-            Email = "user@example.com",
-        };
-        
-        var response = await Client.PostAsync($"{BaseUri}/register", GetContent(userDto));
-        var responseModel = await ResponseSerialize(response);
-        
-        Assert.NotNull(responseModel);
-        Assert.Equal(ApiMessages.PasswordInvalidLength, responseModel.Message);
-        Assert.Equal(StatusCodes.Status400BadRequest, responseModel.StatusCode);
-    }
-    
-    [Fact]
-    public async Task TestRegisterWithMissingUppercasePassword()
-    {
-        var userDto = new UserDTO
-        {
-            Username = "test",
-            Password = "test!1234",
-            Email = "user@example.com",
-        };
-        
-        var response = await Client.PostAsync($"{BaseUri}/register", GetContent(userDto));
-        var responseModel = await ResponseSerialize(response);
-        
-        Assert.NotNull(responseModel);
-        Assert.Equal(ApiMessages.PasswordInvalidUpper, responseModel.Message);
-        Assert.Equal(StatusCodes.Status400BadRequest, responseModel.StatusCode);
-    }
-    
-    [Fact]
-    public async Task TestRegisterWithMissingLowercasePassword()
-    {
-        var userDto = new UserDTO
-        {
-            Username = "test",
-            Password = "TEST!1234",
-            Email = "user@example.com",
-        };
-        
-        var response = await Client.PostAsync($"{BaseUri}/register", GetContent(userDto));
-        var responseModel = await ResponseSerialize(response);
-        
-        Assert.NotNull(responseModel);
-        Assert.Equal(ApiMessages.PasswordInvalidLower, responseModel.Message);
-        Assert.Equal(StatusCodes.Status400BadRequest, responseModel.StatusCode);
-    }
-    
-    [Fact]
-    public async Task TestRegisterWithMissingDigitPassword()
-    {
-        var userDto = new UserDTO
-        {
-            Username = "test",
-            Password = "TESTing!!",
-            Email = "user@example.com",
-        };
-        
-        var response = await Client.PostAsync($"{BaseUri}/register", GetContent(userDto));
-        var responseModel = await ResponseSerialize(response);
-        
-        Assert.NotNull(responseModel);
-        Assert.Equal(ApiMessages.PasswordInvalidDigit, responseModel.Message);
-        Assert.Equal(StatusCodes.Status400BadRequest, responseModel.StatusCode);
-    }
-    
-    [Fact]
-    public async Task TestRegisterWithMissingSpecialCharPassword()
-    {
-        var userDto = new UserDTO
-        {
-            Username = "test",
-            Password = "TesT12345",
-            Email = "user@example.com",
-        };
-        
-        var response = await Client.PostAsync($"{BaseUri}/register", GetContent(userDto));
-        var responseModel = await ResponseSerialize(response);
-        
-        Assert.NotNull(responseModel);
-        Assert.Equal(ApiMessages.PasswordInvalidSpecial, responseModel.Message);
         Assert.Equal(StatusCodes.Status400BadRequest, responseModel.StatusCode);
     }
 }

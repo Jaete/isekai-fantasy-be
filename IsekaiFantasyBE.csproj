@@ -4,6 +4,8 @@
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     </PropertyGroup>
 
     <ItemGroup>
@@ -95,6 +97,15 @@
       <_ContentIncludedByDefault Remove="wwwroot\lib\jquery\dist\jquery.min.js" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\jquery\dist\jquery.min.map" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\jquery\LICENSE.txt" />
+      <_ContentIncludedByDefault Remove="Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\appsettings.Development.json" />
+      <_ContentIncludedByDefault Remove="Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\IsekaiFantasyBE.deps.json" />
+      <_ContentIncludedByDefault Remove="Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\IsekaiFantasyBE.runtimeconfig.json" />
+      <_ContentIncludedByDefault Remove="Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\MvcTestingAppManifest.json" />
+      <_ContentIncludedByDefault Remove="Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests.runtimeconfig.json" />
+      <_ContentIncludedByDefault Remove="Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\obj\project.assets.json" />
+      <_ContentIncludedByDefault Remove="Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\obj\project.packagespec.json" />
+      <_ContentIncludedByDefault Remove="Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\obj\Tests.csproj.nuget.dgspec.json" />
+      <_ContentIncludedByDefault Remove="Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\bin\Debug\net6.0\Tests\obj\Debug\net6.0\MvcTestingAppManifest.json" />
     </ItemGroup>
 
     <ItemGroup>
@@ -102,15 +113,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="chocolatey" Version="2.4.1" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.7" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.7">
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        <PrivateAssets>all</PrivateAssets>
-      </PackageReference>
-      <PackageReference Include="MySql.EntityFrameworkCore" Version="8.0.8" />
-      <PackageReference Include="OneOf" Version="3.0.271" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.30" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
       <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.0" />
       <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
       <PackageReference Include="xunit" Version="2.9.3" />

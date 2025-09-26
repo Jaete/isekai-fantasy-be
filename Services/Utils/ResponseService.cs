@@ -41,4 +41,9 @@ public class ResponseService
     {
         return ResponseModel.Write(null!, message, statusCode, stackTrace);        
     }
+
+    public static ResponseModel Forbidden(string message)
+    {
+        return ResponseModel.Write(null!, message, StatusCodes.Status403Forbidden);
+    }
 }

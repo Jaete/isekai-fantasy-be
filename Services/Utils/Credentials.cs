@@ -1,20 +1,30 @@
 using IsekaiFantasyBE.Models.DTO;
+using IsekaiFantasyBE.Models.Response;
 
 namespace IsekaiFantasyBE.Services.Utils;
 
-public class Credentials
+public static class Credentials
 {
-    public static bool Validate(UserDTO user)
+    private static void ValidateEmptyCredentials(UserDTO user)
     {
-        if (user.Username is null && user.Email is null || user.Password is null)
+        if ((string.IsNullOrEmpty(user.Username) && string.IsNullOrEmpty(user.Email))
+            || user.Password is null
+        )
         {
-            return false;
+            throw new ArgumentException(ApiMessages.EmptyCredentials);
         }
-
-        return true;
     }
+
+    public static void Validate(UserDTO userDto)
+    {
+        ValidateEmptyCredentials(userDto);
+        PasswordService.Validate(userDto.Password);
+        if (userDto.Email is null) { return; }
+        EmailValidationService.IsValidEmail(userDto.Email);
+    }
+    
     public static Guid GenerateEmailValidationToken()
     {
-        return new Guid();
+        return Guid.NewGuid();
     }
 }

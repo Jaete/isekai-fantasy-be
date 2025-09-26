@@ -1,7 +1,7 @@
 {
   "user": {
       "id": "B0B0B0B0-B0B0-B0B0-B0B0-B0B0B0B0B0B0",
-    "username": "string",
+    "username": "User",
     "email": "user@user.com",
     "password": "USERuser123!!"
   },
@@ -12,6 +12,9 @@
     "password": "ADMIROadmiro123!!"
   },
   "banned": {
-    "id": "C0C0C0C0-C0C0-C0C0-C0C0-C0C0C0C0C0C0"
+    "id": "C0C0C0C0-C0C0-C0C0-C0C0-C0C0C0C0C0C0",
+    "username": "BaNiDo",
+    "email": "banned@user.com",
+    "password": "EDNALDOpereiraBANIDO123!!"
   }
 }

@@ -78,6 +78,7 @@ public class JwtService
     
     public static Guid GetAuthenticatedUserId(HttpContext context)
     {
+        RequireAuthentication(context);
         var token = context.Request.Headers.Authorization.ToString().Split(" ")[1];
         var handler = new JwtSecurityTokenHandler();
         var tokenS = handler.ReadToken(token) as JwtSecurityToken;
