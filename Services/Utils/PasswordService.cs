@@ -8,12 +8,7 @@ public static class PasswordService
 {
     public static void Validate(string? password)
     {
-        if (password is null)
-        {
-            throw new ArgumentException(ApiMessages.PasswordInvalidLength);
-        }
-        
-        if (password.Length < 8)
+        if (password is null || password.Length < 8)
         {
             throw new ArgumentException(ApiMessages.PasswordInvalidLength);
         }
@@ -33,7 +28,7 @@ public static class PasswordService
             throw new ArgumentException(ApiMessages.PasswordInvalidDigit);
         }
 
-        if (!password.Any(ch => !char.IsLetterOrDigit(ch)))
+        if (password.All(char.IsLetterOrDigit))
         {
             throw new ArgumentException(ApiMessages.PasswordInvalidSpecial);
         }
@@ -41,15 +36,14 @@ public static class PasswordService
 
     public static byte[] Encrypt(string password)
     {
-        if (password == null)
+        if (password is null)
         {
             throw new ArgumentNullException(nameof(password), "Password cannot be null.");
         }
         
-        using var sha256Hash = SHA256.Create();
-
-        var bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
-        return bytes;
+        return SHA256
+            .Create()
+            .ComputeHash(Encoding.UTF8.GetBytes(password));
     }
     
     public static bool Verify(string password, byte[] hash)

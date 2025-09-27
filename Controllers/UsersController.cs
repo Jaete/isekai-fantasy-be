@@ -238,7 +238,7 @@ public class UsersController : ControllerBase
         }
     }
 
-    [HttpPut]
+    [HttpPatch]
     [Route("update")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

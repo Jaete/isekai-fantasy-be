@@ -19,7 +19,7 @@ public class AdminController : ControllerBase
         _adminService = adminService;
     }
 
-    [HttpPut]
+    [HttpPatch]
     [Route("update/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -54,7 +54,7 @@ public class AdminController : ControllerBase
         }
     }
     
-    [HttpPut]
+    [HttpPost]
     [Route("ban/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -89,7 +89,7 @@ public class AdminController : ControllerBase
         }
     }
     
-    [HttpPut]
+    [HttpPost]
     [Route("silence/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -14,9 +14,9 @@ public interface IUserRepository
 
     Task<PreRegistrationUser?> PreRegisterUser(PreRegistrationUser user);
 
-    Task<User?> FinishRegisterUser(Guid token, string password);
+    Task<User?> FinishRegisterUser(PreRegistrationUser user);
 
-    Task UpdateUserProperties(UserProperties newUserProperties);
+    Task UpdateUserProperties(UserProperties newProperties);
 
     Task<BannedUsers> BanUser(User user, User bannedBy, DateTime bannedUntil, string reason);
 }

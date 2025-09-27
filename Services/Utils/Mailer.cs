@@ -7,8 +7,8 @@ namespace IsekaiFantasyBE.Services.Utils
 {
     public class Mailer
     {
-        private IConfiguration _config;
-        private IWebHostEnvironment _environment;
+        private readonly IConfiguration _config;
+        private readonly IWebHostEnvironment _environment;
 
         public Mailer(IConfiguration config, IWebHostEnvironment environment)
         {
@@ -16,7 +16,7 @@ namespace IsekaiFantasyBE.Services.Utils
             _environment = environment;
         }
 
-        public async void SendEmailVerification(PreRegistrationUser user)
+        public async Task SendEmailVerification(PreRegistrationUser user)
         {
             var templateContent = GetEmailTemplate("verify-email.html");
 
@@ -24,7 +24,7 @@ namespace IsekaiFantasyBE.Services.Utils
                 .Replace("{{Name}}", user.Username)
                 .Replace("{{VerificationLink}}", $"{_config["BaseUrls:AppBaseUrl"]}/verify?token={user.EmailValidationToken}");
 
-            MailMessage email = GetEmail("Validação de Usuário - Isekai Fantasy RPG", emailBody);
+            var email = GetEmail("Validação de Usuário - Isekai Fantasy RPG", emailBody);
             email.To.Add(user.Email);
 
             await SmtpClient().SendMailAsync(email);

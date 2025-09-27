@@ -9,8 +9,8 @@ namespace IsekaiFantasyBE.Services;
 
 public class UserService
 {
-    private UserRepository _userRepo;
-    private Mailer _emailSenderService;
+    private readonly UserRepository _userRepo;
+    private readonly Mailer _emailSenderService;
 
     public UserService(UserRepository userRepo, Mailer emailSenderService)
     {
@@ -20,15 +20,10 @@ public class UserService
 
     public async Task<ResponseModel> GetMyself(Guid id)
     {
-        try
-        {
-            var user = await _userRepo.GetUserById(id);
-            return CreateMyselfResponse(user);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
-        }
+        var user = await _userRepo.GetUserById(id);
+        return user is null 
+            ? ResponseService.NotFound(ApiMessages.UserNotFound) 
+            : ResponseService.Ok(new Myself(user), ApiMessages.UserRetrieved);
     }
 
     public async Task<ResponseModel> GetUserById(Guid id)
@@ -78,7 +73,7 @@ public class UserService
         {
             Email = userDto.Email!,
             Username = userDto.Username!,
-            Password = Encryption.Encrypt(userDto.Password!),
+            Password = PasswordService.Encrypt(userDto.Password!),
             EmailValidationToken = Credentials.GenerateEmailValidationToken(),
         };
 
@@ -91,7 +86,18 @@ public class UserService
     
     public async Task<ResponseModel> FinishRegisterUser(UserConfirmationDTO dto)
     {
-        var user = await _userRepo.FinishRegisterUser(dto.Token, dto.Password);
+        var preRegister = await _userRepo.GetPreRegisteredUserByToken(dto.Token);
+
+        if (preRegister is null)
+        {
+            return ResponseService.NotFound(ApiMessages.NotInPreRegister);
+        }
+        if (!PasswordService.Verify(dto.Password, preRegister.Password))
+        { 
+            return ResponseService.BadRequest(ApiMessages.WrongPassword);
+        }
+        
+        var user = await _userRepo.FinishRegisterUser(preRegister);
 
         return user is null 
             ? ResponseService.NotFound(ApiMessages.NotInPreRegister)
@@ -115,7 +121,7 @@ public class UserService
             return ResponseService.BadRequest(ApiMessages.WrongPassword);
         }
 
-        if (user.Properties!.Status == UserStatus.Banned)
+        if (user.Properties.Status == UserStatus.Banned)
         {
             throw new UnauthorizedAccessException(ApiMessages.UserBanned);
         }
@@ -147,19 +153,6 @@ public class UserService
 
         return ResponseService.Ok(
             new UserResponse(user.Id, user.Username), ApiMessages.UserUpdated
-        );
-    }
-    
-    private static ResponseModel CreateMyselfResponse(User? user)
-    {
-        if (user is null)
-        {
-            return ResponseService.NotFound(ApiMessages.UserNotFound);
-        }
-        
-        return ResponseService.Ok(
-            new Myself(user),
-            message: ApiMessages.UserRetrieved
         );
     }
 }

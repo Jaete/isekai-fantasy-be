@@ -41,80 +41,59 @@ public class UserRepository : IUserRepository
 
     public async Task<PreRegistrationUser?> PreRegisterUser(PreRegistrationUser user)
     {
-        try
-        {
-            _dbContext.PreRegistrationUsers.Add(user);
-            await _dbContext.SaveChangesAsync();
+        _dbContext.PreRegistrationUsers.Add(user);
+        await _dbContext.SaveChangesAsync();
 
-            return user;
-        }
-        catch (Exception e)
-        {
-            throw new Exception(e.Message);
-        }
+        return user;
     }
 
     public async Task<PreRegistrationUser?> GetPreRegisteredUserByEmail(string email)
     {
         return await _dbContext.PreRegistrationUsers.FirstOrDefaultAsync(up => up.Email == email);
     }
-    
-    public async Task<User?> FinishRegisterUser(Guid token, string password)
-    {
-        try
-        {
-            PreRegistrationUser? preRegister = await _dbContext.PreRegistrationUsers.FirstOrDefaultAsync(
-                preReg => preReg.EmailValidationToken == token
-            );
-            if (preRegister is null)
-            {
-                return null;
-            }
-            
-            var encryptedPass = Encryption.Encrypt(password);
-            if (!Encryption.Compare(encryptedPass, preRegister.Password))
-            { 
-                return null;
-            }
-            
-            User user = new User()
-            {
-                Id = preRegister.Id,
-                Email = preRegister.Email,
-                Username = preRegister.Username,
-                Password = preRegister.Password,
-            };
-            
-            var properties = new UserProperties
-            {
-                User = user,
-                Status = UserStatus.Active,
-            };
-            user.Properties = properties;
-            
-            await _dbContext.Users.AddAsync(user);
-            await _dbContext.UsersProperties.AddAsync(properties);
-            _dbContext.PreRegistrationUsers.Remove(preRegister);
-            await _dbContext.SaveChangesAsync();
 
-            return user;
-        }
-        catch (Exception e)
+    public async Task<PreRegistrationUser?> GetPreRegisteredUserByToken(Guid token)
+    {
+        return await _dbContext.PreRegistrationUsers.FirstOrDefaultAsync(
+            preReg => preReg.EmailValidationToken == token
+        );
+    }
+    
+    public async Task<User?> FinishRegisterUser(PreRegistrationUser preRegister)
+    {
+        var user = new User
         {
-            throw new Exception(e.Message);
-        }
+            Id = preRegister.Id,
+            Email = preRegister.Email,
+            Username = preRegister.Username,
+            Password = preRegister.Password,
+        };
+        
+        var properties = new UserProperties
+        {
+            User = user,
+            Status = UserStatus.Active,
+        };
+        user.Properties = properties;
+        
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.UsersProperties.AddAsync(properties);
+        _dbContext.PreRegistrationUsers.Remove(preRegister);
+        await _dbContext.SaveChangesAsync();
+
+        return user;
     }
 
-    public async Task UpdateUserProperties(UserProperties newUserProperties)
+    public async Task UpdateUserProperties(UserProperties newProperties)
     {
-        var properties = await _dbContext.UsersProperties.FirstOrDefaultAsync(up => up.User.Id == newUserProperties.User.Id);
+        var properties = await _dbContext.UsersProperties.FirstOrDefaultAsync(up => up.User.Id == newProperties.User.Id);
         if (properties is null)
         {
             throw new KeyNotFoundException(ApiMessages.PropertiesNotFound);
         }
         
-        properties.Bio = newUserProperties.Bio ?? properties.Bio;
-        properties.Photo = newUserProperties.Photo ?? properties.Photo;
+        properties.Bio = newProperties.Bio ?? properties.Bio;
+        properties.Photo = newProperties.Photo ?? properties.Photo;
         properties.LastActivity = DateTime.Now;
 
         _dbContext.UsersProperties.Update(properties);
@@ -123,7 +102,7 @@ public class UserRepository : IUserRepository
 
     public async Task<BannedUsers> BanUser(User user, User bannedBy, DateTime bannedUntil, string reason)
     {
-        var bannedUser = new BannedUsers()
+        var bannedUser = new BannedUsers
         {
             User = user,
             BannedBy = bannedBy,
@@ -132,8 +111,8 @@ public class UserRepository : IUserRepository
             Reason = reason
         };
 
-        user.Properties!.Status = UserStatus.Banned;
-        _dbContext.UsersProperties.Update(user.Properties!);
+        user.Properties.Status = UserStatus.Banned;
+        _dbContext.UsersProperties.Update(user.Properties);
         _dbContext.BannedUsers.Add(bannedUser);
         
         await _dbContext.SaveChangesAsync();
@@ -143,8 +122,8 @@ public class UserRepository : IUserRepository
 
     public async Task<SilencedUsers> SilenceUser(User user, User admin, SilenceUserDTO silenceUserProps)
     {
-        user.Properties!.Status = UserStatus.Silenced;
-        var silencedUser = new SilencedUsers()
+        user.Properties.Status = UserStatus.Silenced;
+        var silencedUser = new SilencedUsers
         {
             User = user,
             SilencedBy = admin,
@@ -154,7 +133,7 @@ public class UserRepository : IUserRepository
         };
 
         _dbContext.SilencedUsers.Add(silencedUser);
-        _dbContext.UsersProperties.Update(user.Properties!);
+        _dbContext.UsersProperties.Update(user.Properties);
         await _dbContext.SaveChangesAsync();
         return silencedUser;
     }

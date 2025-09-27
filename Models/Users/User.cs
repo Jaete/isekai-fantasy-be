@@ -26,5 +26,5 @@ public class User
     [Column(TypeName = DbProperties.Datetime)][DefaultValue(DbProperties.CurrentTimestamp)] 
     public DateTime? LastLogin { get; set; }
     
-    public UserProperties? Properties { get; set; }
+    public UserProperties Properties { get; set; }
 }
