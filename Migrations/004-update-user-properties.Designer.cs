@@ -3,6 +3,7 @@ using System;
 using IsekaiFantasyBE.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,11 +11,13 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IsekaiFantasyBE.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class UserDbContextModelSnapshot : ModelSnapshot
+    [Migration("004-update-user-properties")]
+    partial class _004updateuserproperties
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
+            // Copiamos o conteúdo do seu ModelSnapshot atual aqui
             modelBuilder
                 .HasAnnotation("ProductVersion", "6.0.33")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
@@ -135,7 +138,6 @@ namespace IsekaiFantasyBE.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<DateTime?>("LastLogin")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
@@ -167,8 +169,7 @@ namespace IsekaiFantasyBE.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("LastActivity")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
+                        .HasColumnType("datetime")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Photo")

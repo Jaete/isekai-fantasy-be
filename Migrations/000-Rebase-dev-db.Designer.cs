@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IsekaiFantasyBE.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20250822224708_000-Rebase-dev-db")]
+    [Migration("000-Rebase-dev-db")]
     partial class _000Rebasedevdb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IsekaiFantasyBE.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20250823043117_003-user-to-be-banned")]
+    [Migration("003-user-to-be-banned")]
     partial class _003usertobebanned
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

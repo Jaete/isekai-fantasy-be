@@ -11,7 +11,7 @@ namespace IsekaiFantasyBE.Repository;
 
 public class UserRepository : IUserRepository
 {
-    private AppDBContext _dbContext;
+    private readonly AppDBContext _dbContext;
     
     public UserRepository(AppDBContext dbContext)
     {

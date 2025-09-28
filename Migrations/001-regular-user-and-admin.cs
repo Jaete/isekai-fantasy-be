@@ -55,7 +55,7 @@ namespace IsekaiFantasyBE.Migrations
                     AdminId,
                     null,
                     null,
-                    UserStatus.Active,
+                    UserStatus.Active.Value,
                     (int)UserProperties.Role.Admin,
                     DateTime.Now,
                 }
@@ -69,7 +69,7 @@ namespace IsekaiFantasyBE.Migrations
                     UserId,
                     null,
                     null,
-                    UserStatus.Active,
+                    UserStatus.Active.Value,
                     (int)UserProperties.Role.Member,
                     DateTime.Now,
                 }

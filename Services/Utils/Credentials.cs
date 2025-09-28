@@ -20,7 +20,7 @@ public static class Credentials
         ValidateEmptyCredentials(userDto);
         PasswordService.Validate(userDto.Password);
         if (userDto.Email is null) { return; }
-        EmailValidationService.IsValidEmail(userDto.Email);
+        EmailValidationService.ValidateEmail(userDto.Email);
     }
     
     public static Guid GenerateEmailValidationToken()

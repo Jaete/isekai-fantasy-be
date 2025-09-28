@@ -37,7 +37,7 @@ public class UserService
 
     public async Task<ResponseModel> GetUserByEmail(string email)
     {
-        EmailValidationService.IsValidEmail(email);
+        EmailValidationService.ValidateEmail(email);
         
         var user = await _userRepo.GetUserByEmail(email);
         return user is null 
@@ -107,9 +107,7 @@ public class UserService
     public async Task<ResponseModel> LoginUser(UserDTO userDto)
     {
         Credentials.Validate(userDto);
-        var user = userDto.Username != null 
-            ? await _userRepo.GetUserByUsername(userDto.Username!)
-            : await _userRepo.GetUserByEmail(userDto.Email!);
+        var user = await GetUserByHandle(userDto.Username ?? userDto.Email!);
         
         if (user is null)
         {
@@ -154,5 +152,39 @@ public class UserService
         return ResponseService.Ok(
             new UserResponse(user.Id, user.Username), ApiMessages.UserUpdated
         );
+    }
+    
+    public async Task<ResponseModel> ResetPasswordRequest(string handle)
+    {
+        var user = await GetUserByHandle(handle);
+        
+        if (user is null)
+        {
+            return ResponseService.NotFound(ApiMessages.UserNotFound);
+        }
+
+        /*var resetToken = Credentials.GeneratePasswordResetToken();
+        user.PasswordResetToken = resetToken;
+        user.PasswordResetTokenExpiration = DateTime.Now.AddMinutes(10);
+        
+        await _userRepo.UpdateUser(user);
+        _emailSenderService.SendPasswordReset(user);
+
+        return ResponseService.Ok(ApiMessages.PasswordResetEmailSent);*/
+        return ResponseService.Ok(new UserResponse(user.Id, user.Username), ApiMessages.UserUpdated);
+    }
+    
+    private async Task<User?> GetUserByHandle(string handle)
+    {
+        User? user;
+        if (EmailValidationService.ValidateEmail(handle, false))
+        {
+            user = await _userRepo.GetUserByEmail(handle);
+        }
+        else
+        {
+            user = await _userRepo.GetUserByUsername(handle);
+        }
+        return user;
     }
 }

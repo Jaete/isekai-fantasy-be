@@ -1,25 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\jaete\\Documents\\Pessoais\\isekai-fantasy-be\\Tests\\Tests.csproj": {}
+    "C:\\Users\\Jaete\\RiderProjects\\IsekaiFantasyBE\\Tests\\Tests.csproj": {}
   },
   "projects": {
-    "C:\\Users\\jaete\\Documents\\Pessoais\\isekai-fantasy-be\\IsekaiFantasyBE.csproj": {
+    "C:\\Users\\Jaete\\RiderProjects\\IsekaiFantasyBE\\IsekaiFantasyBE.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\jaete\\Documents\\Pessoais\\isekai-fantasy-be\\IsekaiFantasyBE.csproj",
+        "projectUniqueName": "C:\\Users\\Jaete\\RiderProjects\\IsekaiFantasyBE\\IsekaiFantasyBE.csproj",
         "projectName": "IsekaiFantasyBE",
-        "projectPath": "C:\\Users\\jaete\\Documents\\Pessoais\\isekai-fantasy-be\\IsekaiFantasyBE.csproj",
-        "packagesPath": "C:\\Users\\jaete\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\jaete\\Documents\\Pessoais\\isekai-fantasy-be\\obj\\",
+        "projectPath": "C:\\Users\\Jaete\\RiderProjects\\IsekaiFantasyBE\\IsekaiFantasyBE.csproj",
+        "packagesPath": "C:\\Users\\Jaete\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Jaete\\RiderProjects\\IsekaiFantasyBE\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\jaete\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Jaete\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -47,6 +53,12 @@
               "version": "[6.0.30, )"
             },
             "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
               "target": "Package",
               "version": "[6.0.0, )"
             },
@@ -86,30 +98,36 @@
         }
       }
     },
-    "C:\\Users\\jaete\\Documents\\Pessoais\\isekai-fantasy-be\\Tests\\Tests.csproj": {
+    "C:\\Users\\Jaete\\RiderProjects\\IsekaiFantasyBE\\Tests\\Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\jaete\\Documents\\Pessoais\\isekai-fantasy-be\\Tests\\Tests.csproj",
+        "projectUniqueName": "C:\\Users\\Jaete\\RiderProjects\\IsekaiFantasyBE\\Tests\\Tests.csproj",
         "projectName": "Tests",
-        "projectPath": "C:\\Users\\jaete\\Documents\\Pessoais\\isekai-fantasy-be\\Tests\\Tests.csproj",
-        "packagesPath": "C:\\Users\\jaete\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\jaete\\Documents\\Pessoais\\isekai-fantasy-be\\Tests\\obj\\",
+        "projectPath": "C:\\Users\\Jaete\\RiderProjects\\IsekaiFantasyBE\\Tests\\Tests.csproj",
+        "packagesPath": "C:\\Users\\Jaete\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Jaete\\RiderProjects\\IsekaiFantasyBE\\Tests\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\jaete\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Jaete\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "C:\\Users\\jaete\\Documents\\Pessoais\\isekai-fantasy-be\\IsekaiFantasyBE.csproj": {
-                "projectPath": "C:\\Users\\jaete\\Documents\\Pessoais\\isekai-fantasy-be\\IsekaiFantasyBE.csproj"
+              "C:\\Users\\Jaete\\RiderProjects\\IsekaiFantasyBE\\IsekaiFantasyBE.csproj": {
+                "projectPath": "C:\\Users\\Jaete\\RiderProjects\\IsekaiFantasyBE\\IsekaiFantasyBE.csproj"
               }
             }
           }

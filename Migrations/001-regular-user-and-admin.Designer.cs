@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IsekaiFantasyBE.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20250822225600_001-regular-user-and-admin")]
+    [Migration("001-regular-user-and-admin")]
     partial class _001regularuserandadmin
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

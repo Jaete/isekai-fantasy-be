@@ -16,7 +16,7 @@ namespace IsekaiFantasyBE.Services.Utils
             _environment = environment;
         }
 
-        public async Task SendEmailVerification(PreRegistrationUser user)
+        public virtual async Task SendEmailVerification(PreRegistrationUser user)
         {
             var templateContent = GetEmailTemplate("verify-email.html");
 

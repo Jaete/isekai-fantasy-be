@@ -1,40 +1,27 @@
 ﻿using System.Text;
 using System.Text.Json;
+using IsekaiFantasyBE.Contexts;
 using IsekaiFantasyBE.Models.Response;
-using Xunit;
+using IsekaiFantasyBE.Services.Utils;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace IsekaiFantasyBE.Tests;
 
 public class BaseApiTest : IClassFixture<WebApplicationFactory<Program>>
 {
     protected readonly HttpClient Client;
+    protected readonly WebApplicationFactory<Program> _factory;
 
-    public BaseApiTest(WebApplicationFactory<Program> factory)
+    protected BaseApiTest(WebApplicationFactory<Program> factory)
     {
+        _factory = factory;
+        ResetDatabase();
         Client = factory.CreateClient();
     }
-    /*private static string GetUri()
-    {
-        var configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json")
-            .Build();
-        return configuration["Api:BaseAddress"];
-    }
     
-    protected static HttpClient SetupClient()
-    {
-        var handler = new HttpClientHandler
-        {
-            ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
-        };
-
-        var client = new HttpClient(handler);
-        client.BaseAddress = new Uri(GetUri());
-        
-        return client;
-    }*/
-
     protected static async Task<ResponseModel?> ResponseSerialize(HttpResponseMessage response)
     {
         var responseJson = await response.Content.ReadAsStringAsync();
@@ -51,5 +38,20 @@ public class BaseApiTest : IClassFixture<WebApplicationFactory<Program>>
             Encoding.UTF8,
             "application/json"
         );
+    }
+
+    private void ResetDatabase()
+    {
+        using var scope = _factory.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDBContext>();
+        context.Database.EnsureDeleted();
+        context.Database.Migrate();
+    }
+
+    protected async Task<T?> FindEntityAsync<T>(object id) where T : class
+    {
+        using var scope = _factory.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDBContext>();
+        return await context.Set<T>().FindAsync(id);
     }
 }

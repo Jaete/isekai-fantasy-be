@@ -9,11 +9,13 @@ public class EmailValidationService
         @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
         RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-    public static void IsValidEmail(string? email)
+    public static bool ValidateEmail(string? email, bool throwError = true)
     {
         if (string.IsNullOrWhiteSpace(email) || !EmailRegex.IsMatch(email))
         {
-            throw new ArgumentException(ApiMessages.EmailInvalid);
+            return throwError ? throw new ArgumentException(ApiMessages.EmailInvalid) : false;
         }
+
+        return true;
     }
 }

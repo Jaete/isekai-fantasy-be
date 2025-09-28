@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IsekaiFantasyBE.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20250406014346_005-pre-registration-user")]
+    [Migration("005-pre-registration-user")]
     partial class _005preregistrationuser
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,9 +36,9 @@ namespace IsekaiFantasyBE.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<byte[]>("EmailValidationToken")
+                    b.Property<Guid>("EmailValidationToken")
                         .IsRequired()
-                        .HasColumnType("longblob");
+                        .HasColumnType("char(36)");
 
                     b.Property<byte[]>("Password")
                         .IsRequired()

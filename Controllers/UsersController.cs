@@ -1,6 +1,7 @@
 ﻿using IsekaiFantasyBE.Models.DTO;
 using IsekaiFantasyBE.Models.Users;
 using IsekaiFantasyBE.Models.Response;
+using IsekaiFantasyBE.Models.Response.Entities;
 using IsekaiFantasyBE.Services;
 using IsekaiFantasyBE.Services.Utils;
 using Microsoft.AspNetCore.Mvc;
@@ -193,8 +194,7 @@ public class UsersController : ControllerBase
             {
                 StatusCodes.Status400BadRequest => BadRequest(response),
                 StatusCodes.Status404NotFound => NotFound(response),
-                StatusCodes.Status500InternalServerError => StatusCode(StatusCodes.Status500InternalServerError, response),
-                _ => Ok(ResponseModel.Write(user!.Id, ApiMessages.UserCreated, StatusCodes.Status201Created)),
+                _ => Created("", response),
             };
         }
         catch (Exception e)
@@ -224,7 +224,6 @@ public class UsersController : ControllerBase
             {
                 StatusCodes.Status400BadRequest => BadRequest(response),
                 StatusCodes.Status404NotFound => NotFound(response),
-                StatusCodes.Status500InternalServerError => StatusCode(StatusCodes.Status500InternalServerError, response),
                 _ => Ok(response),
             };
         }

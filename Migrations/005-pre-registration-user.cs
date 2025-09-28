@@ -29,9 +29,9 @@ namespace IsekaiFantasyBE.Migrations
                     Email = table.Column<string>(type: "VARCHAR(32)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Password = table.Column<byte[]>(type: "longblob", nullable: false),
-                    EmailValidationToken = table.Column<byte[]>(type: "longblob", nullable: false),
+                    EmailValidationToken = table.Column<Guid>(type: "VARCHAR(36)", nullable: false, collation: "ascii_general_ci"),
                     CreatedAt = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
+                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP"),
                 },
                 constraints: table =>
                 {

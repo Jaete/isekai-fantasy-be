@@ -36,7 +36,7 @@ namespace IsekaiFantasyBE.Migrations
                     BannedId,
                     null,
                     null,
-                    UserStatus.Active,
+                    UserStatus.Active.Value,
                     (int)UserProperties.Role.Member,
                     DateTime.Now,
                 }
