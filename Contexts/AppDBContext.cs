@@ -1,5 +1,6 @@
 ﻿using IsekaiFantasyBE.Database;
 using IsekaiFantasyBE.Models.Users;
+using IsekaiFantasyBE.Models.Users.Requests;
 using Microsoft.EntityFrameworkCore;
 
 namespace IsekaiFantasyBE.Contexts;
@@ -14,6 +15,8 @@ public class AppDBContext : DbContext
     
     public DbSet<SilencedUsers> SilencedUsers { get; set; }
     public DbSet<BannedUsers> BannedUsers { get; set; }
+    
+    public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -59,6 +62,11 @@ public class AppDBContext : DbContext
         
         modelBuilder.Entity<SilencedUsers>()
             .Property(su => su.SilencedAt)
+            .HasDefaultValueSql(DbProperties.CurrentTimestamp)
+            .ValueGeneratedOnAdd();
+        
+        modelBuilder.Entity<PasswordResetRequest>()
+            .Property(u => u.CreatedAt)
             .HasDefaultValueSql(DbProperties.CurrentTimestamp)
             .ValueGeneratedOnAdd();
     }

@@ -23,7 +23,7 @@ public static class Credentials
         EmailValidationService.ValidateEmail(userDto.Email);
     }
     
-    public static Guid GenerateEmailValidationToken()
+    public static Guid GenerateValidationToken()
     {
         return Guid.NewGuid();
     }

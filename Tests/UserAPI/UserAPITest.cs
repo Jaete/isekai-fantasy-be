@@ -1,16 +1,15 @@
 ﻿// UserControllerTests.cs
 
 using System.Text.Json;
-using System.Threading.Tasks;
-using IsekaiFantasyBE.Contexts;
+using IsekaiFantasyBE;
 using IsekaiFantasyBE.Models.DTO;
 using IsekaiFantasyBE.Models.Response;
 using IsekaiFantasyBE.Models.Users;
+using IsekaiFantasyBE.Tests;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace IsekaiFantasyBE.Tests.UserAPI;
+namespace Tests.UserAPI;
 
 public class UserControllerTests : BaseApiTest
 {
@@ -236,7 +235,4 @@ public class UserControllerTests : BaseApiTest
         Assert.Equal(StatusCodes.Status201Created, responseModel.StatusCode);
         Assert.Equal(ApiMessages.UserCreated, responseModel.Message);
     }
-    
-    [Fact]
-    
 }

@@ -4,6 +4,7 @@ using IsekaiFantasyBE.Models.DTO;
 using IsekaiFantasyBE.Models.Response;
 using IsekaiFantasyBE.Models.Response.Entities;
 using IsekaiFantasyBE.Models.Users;
+using IsekaiFantasyBE.Models.Users.Requests;
 using IsekaiFantasyBE.Services.Utils;
 using Microsoft.EntityFrameworkCore;
 
@@ -136,5 +137,13 @@ public class UserRepository : IUserRepository
         _dbContext.UsersProperties.Update(user.Properties);
         await _dbContext.SaveChangesAsync();
         return silencedUser;
+    }
+
+    public async Task<PasswordResetRequest> NewPasswordResetRequest(User user)
+    {
+        var request = PasswordResetRequest.Create(user);
+        _dbContext.PasswordResetRequests.Add(request);
+        await _dbContext.SaveChangesAsync();
+        return request;
     }
 }
