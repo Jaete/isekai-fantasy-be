@@ -2,6 +2,7 @@ using IsekaiFantasyBE.Models.DTO;
 using IsekaiFantasyBE.Models.Response;
 using IsekaiFantasyBE.Models.Response.Entities;
 using IsekaiFantasyBE.Models.Users;
+using IsekaiFantasyBE.Models.Users.Requests;
 using IsekaiFantasyBE.Repository;
 using IsekaiFantasyBE.Services.Utils;
 
@@ -74,7 +75,7 @@ public class UserService
             Email = userDto.Email!,
             Username = userDto.Username!,
             Password = PasswordService.Encrypt(userDto.Password!),
-            EmailValidationToken = Credentials.GenerateEmailValidationToken(),
+            EmailValidationToken = Credentials.GenerateValidationToken(),
         };
 
         await _userRepo.PreRegisterUser(preRegister);
@@ -163,14 +164,9 @@ public class UserService
             return ResponseService.NotFound(ApiMessages.UserNotFound);
         }
 
-        /*var resetToken = Credentials.GeneratePasswordResetToken();
-        user.PasswordResetToken = resetToken;
-        user.PasswordResetTokenExpiration = DateTime.Now.AddMinutes(10);
+        var passwordRestRequest = _userRepo.NewPasswordResetRequest(user);
+        _emailSenderService.SendPasswordResetEmail(passwordRestRequest);
         
-        await _userRepo.UpdateUser(user);
-        _emailSenderService.SendPasswordReset(user);
-
-        return ResponseService.Ok(ApiMessages.PasswordResetEmailSent);*/
         return ResponseService.Ok(new UserResponse(user.Id, user.Username), ApiMessages.UserUpdated);
     }
     

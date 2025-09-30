@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Mail;
 using System.Text;
 using IsekaiFantasyBE.Models.Users;
+using IsekaiFantasyBE.Models.Users.Requests;
 
 namespace IsekaiFantasyBE.Services.Utils
 {
@@ -28,6 +29,12 @@ namespace IsekaiFantasyBE.Services.Utils
             email.To.Add(user.Email);
 
             await SmtpClient().SendMailAsync(email);
+        }
+        
+        
+        public void SendPasswordResetEmail(Task<PasswordResetRequest> passwordRestRequest)
+        {
+            throw new NotImplementedException();
         }
 
         private MailMessage GetEmail(string subject, string body)
